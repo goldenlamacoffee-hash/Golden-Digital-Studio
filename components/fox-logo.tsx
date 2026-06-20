@@ -2,57 +2,75 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
+/**
+ * Official Golden Digital Studio fox assets. These are the uploaded brand
+ * files used as-is (object-contain only — never cropped, stretched, masked,
+ * rotated, or recolored). The full curled-tail fox is always visible.
+ */
+const ASSETS = {
+  // Header — full-color horizontal fox + wordmark lockup
+  lockup: { src: '/brand/fox-lockup.png', width: 751, height: 371, alt: 'Golden Digital Studio' },
+  // Footer / monochrome contexts — black fox + wordmark lockup
+  'mono-lockup': { src: '/brand/fox-mono-lockup.png', width: 421, height: 212, alt: 'Golden Digital Studio' },
+  // Hero / brand sections — full vertical primary logo (fox + stacked wordmark)
+  primary: { src: '/brand/fox-primary.png', width: 676, height: 686, alt: 'Golden Digital Studio' },
+  // Large emblem placements — gold fox emblem on transparent
+  emblem: { src: '/brand/fox-emblem.png', width: 690, height: 690, alt: 'Golden Digital Studio fox emblem' },
+  // Favicon / app icon / social — compact fox icon tile
+  'compact-icon': { src: '/brand/fox-compact-icon.png', width: 173, height: 187, alt: 'Golden Digital Studio' },
+} as const
+
+type FoxVariant = keyof typeof ASSETS
+
 type FoxLogoProps = {
-  /** Show the wordmark next to the emblem. */
-  withWordmark?: boolean
-  /** Show the small tagline under the wordmark. */
-  withTagline?: boolean
+  variant?: FoxVariant
+  priority?: boolean
   className?: string
-  emblemClassName?: string
+  imageClassName?: string
+  /** Render without the wrapping home link (e.g. when already inside a link). */
+  asLink?: boolean
 }
 
 export function FoxLogo({
-  withWordmark = true,
-  withTagline = false,
+  variant = 'lockup',
+  priority = false,
   className,
-  emblemClassName,
+  imageClassName,
+  asLink = true,
 }: FoxLogoProps) {
+  const asset = ASSETS[variant]
+
+  const sizeClass =
+    variant === 'lockup'
+      ? 'h-12 w-auto sm:h-14'
+      : variant === 'mono-lockup'
+        ? 'h-10 w-auto sm:h-12'
+        : variant === 'compact-icon'
+          ? 'size-10'
+          : 'h-auto w-full'
+
+  const content = (
+    <Image
+      src={asset.src}
+      alt={asset.alt}
+      width={asset.width}
+      height={asset.height}
+      priority={priority}
+      className={cn('object-contain', sizeClass, imageClassName)}
+    />
+  )
+
+  if (!asLink) {
+    return <span className={cn('inline-flex items-center', className)}>{content}</span>
+  }
+
   return (
     <Link
       href="/"
       aria-label="Golden Digital Studio — home"
-      className={cn('group inline-flex items-center gap-3', className)}
+      className={cn('group inline-flex items-center transition-opacity hover:opacity-90', className)}
     >
-      <span
-        className={cn(
-          'relative inline-flex size-10 items-center justify-center rounded-xl border border-gold/30 bg-espresso/60 transition-colors group-hover:border-gold/60',
-          emblemClassName,
-        )}
-      >
-        <Image
-          src="/fox-emblem.png"
-          alt=""
-          width={40}
-          height={40}
-          className="size-8 object-contain"
-          priority
-        />
-      </span>
-      {withWordmark ? (
-        <span className="flex flex-col leading-none">
-          <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-sand">
-            Golden
-          </span>
-          <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-gold">
-            Digital Studio
-          </span>
-          {withTagline ? (
-            <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              {'Digital systems. AI workflows. Impact.'}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
+      {content}
     </Link>
   )
 }

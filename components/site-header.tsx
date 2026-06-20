@@ -35,7 +35,7 @@ export function SiteHeader() {
       )}
     >
       <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-        <FoxLogo />
+        <FoxLogo priority />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {nav.map((item) => {

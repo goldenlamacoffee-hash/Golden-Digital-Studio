@@ -3,56 +3,71 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
 type FoxLogoProps = {
-  /** Show the wordmark next to the emblem. */
-  withWordmark?: boolean
-  /** Show the small tagline under the wordmark. */
+  /**
+   * Which official asset to render.
+   * - "lockup": horizontal fox + "Golden Digital Studio" wordmark (header / footer)
+   * - "emblem": fox head emblem only (compact / icon placements)
+   */
+  variant?: 'lockup' | 'emblem'
+  /** Show the small tagline under an emblem-only mark. */
   withTagline?: boolean
   className?: string
-  emblemClassName?: string
+  imageClassName?: string
+  /** Render without the wrapping home link (e.g. when already inside a link). */
+  asLink?: boolean
 }
 
 export function FoxLogo({
-  withWordmark = true,
+  variant = 'lockup',
   withTagline = false,
   className,
-  emblemClassName,
+  imageClassName,
+  asLink = true,
 }: FoxLogoProps) {
+  const content =
+    variant === 'lockup' ? (
+      <Image
+        src="/brand/fox-lockup.png"
+        alt="Golden Digital Studio"
+        width={751}
+        height={371}
+        priority
+        className={cn('h-12 w-auto object-contain sm:h-14', imageClassName)}
+      />
+    ) : (
+      <span className="inline-flex items-center gap-3">
+        <Image
+          src="/brand/fox-emblem.png"
+          alt="Golden Digital Studio"
+          width={690}
+          height={690}
+          priority
+          className={cn('size-10 object-contain', imageClassName)}
+        />
+        {withTagline ? (
+          <span className="flex flex-col leading-none">
+            <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-sand">
+              Golden
+            </span>
+            <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-gold">
+              Digital Studio
+            </span>
+          </span>
+        ) : null}
+      </span>
+    )
+
+  if (!asLink) {
+    return <span className={cn('inline-flex items-center', className)}>{content}</span>
+  }
+
   return (
     <Link
       href="/"
       aria-label="Golden Digital Studio — home"
-      className={cn('group inline-flex items-center gap-3', className)}
+      className={cn('group inline-flex items-center transition-opacity hover:opacity-90', className)}
     >
-      <span
-        className={cn(
-          'relative inline-flex size-10 items-center justify-center rounded-xl border border-gold/30 bg-espresso/60 transition-colors group-hover:border-gold/60',
-          emblemClassName,
-        )}
-      >
-        <Image
-          src="/fox-emblem.png"
-          alt=""
-          width={40}
-          height={40}
-          className="size-8 object-contain"
-          priority
-        />
-      </span>
-      {withWordmark ? (
-        <span className="flex flex-col leading-none">
-          <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-sand">
-            Golden
-          </span>
-          <span className="font-heading text-sm font-semibold uppercase tracking-[0.18em] text-gold">
-            Digital Studio
-          </span>
-          {withTagline ? (
-            <span className="mt-1 font-mono text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-              {'Digital systems. AI workflows. Impact.'}
-            </span>
-          ) : null}
-        </span>
-      ) : null}
+      {content}
     </Link>
   )
 }

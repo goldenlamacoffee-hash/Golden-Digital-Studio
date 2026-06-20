@@ -38,7 +38,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div className="flex flex-col gap-5">
-            <FoxLogo withTagline />
+            <FoxLogo className="w-fit" />
             <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
               Practical digital systems — websites, portals, apps and AI
               workflows — for ambitious small businesses across{' '}

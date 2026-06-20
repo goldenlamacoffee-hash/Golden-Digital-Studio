@@ -7,16 +7,17 @@ export function CtaSection() {
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <div className="relative overflow-hidden rounded-3xl border border-gold/25 bg-espresso px-6 py-16 sm:px-12 sm:py-20">
           <div
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end"
             aria-hidden="true"
           >
             <Image
-              src="/fox-hero.png"
+              src="/brand/fox-emblem.png"
               alt=""
-              fill
-              className="object-cover object-right opacity-40"
+              width={690}
+              height={690}
+              className="h-full w-auto max-w-none object-contain opacity-30"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-espresso via-espresso/85 to-espresso/30" />
+            <div className="absolute inset-0 bg-gradient-to-r from-espresso via-espresso/85 to-espresso/40" />
           </div>
 
           <div className="relative flex max-w-2xl flex-col gap-6">

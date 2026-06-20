@@ -5,17 +5,21 @@ import { site } from '@/lib/content'
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Background emblem */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+      {/* Brand emblem — official asset, never cropped or stretched */}
+      <div
+        className="pointer-events-none absolute inset-y-0 right-0 flex w-full items-center justify-end sm:w-[70%] lg:w-1/2"
+        aria-hidden="true"
+      >
         <Image
-          src="/fox-hero.png"
+          src="/brand/fox-emblem.png"
           alt=""
-          fill
+          width={690}
+          height={690}
           priority
-          className="object-cover object-right opacity-40 sm:opacity-55 lg:opacity-70"
+          className="h-auto w-[88%] max-w-xl object-contain opacity-25 sm:opacity-40 lg:opacity-70"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/20" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/30" />
       </div>
 
       <div className="relative mx-auto flex max-w-6xl flex-col gap-8 px-5 pt-20 pb-24 sm:px-8 sm:pt-28 sm:pb-32 lg:min-h-[88vh] lg:justify-center">

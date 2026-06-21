@@ -77,6 +77,24 @@ export async function getCounts() {
   }
 }
 
+/** Row counts per locale for the content tables — powers the locale debug panel. */
+export async function getLocaleContentCounts(locale: Locale) {
+  const [s, p, k, sec, set] = await Promise.all([
+    db.select({ c: sql<number>`count(*)::int` }).from(services).where(eq(services.locale, locale)),
+    db.select({ c: sql<number>`count(*)::int` }).from(projects).where(eq(projects.locale, locale)),
+    db.select({ c: sql<number>`count(*)::int` }).from(packages).where(eq(packages.locale, locale)),
+    db.select({ c: sql<number>`count(*)::int` }).from(sections).where(eq(sections.locale, locale)),
+    db.select({ c: sql<number>`count(*)::int` }).from(siteSettings).where(eq(siteSettings.locale, locale)),
+  ])
+  return {
+    services: s[0]?.c ?? 0,
+    projects: p[0]?.c ?? 0,
+    packages: k[0]?.c ?? 0,
+    sections: sec[0]?.c ?? 0,
+    settings: set[0]?.c ?? 0,
+  }
+}
+
 export async function countNewInquiries() {
   const rows = await db
     .select({ c: sql<number>`count(*)::int` })

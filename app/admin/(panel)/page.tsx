@@ -7,7 +7,13 @@ import {
   Inbox,
   ArrowUpRight,
 } from 'lucide-react'
-import { getCounts, countNewInquiries } from '@/lib/admin/queries'
+import {
+  getCounts,
+  countNewInquiries,
+  getLocaleContentCounts,
+} from '@/lib/admin/queries'
+import { getLocaleDebug } from '@/lib/i18n/server'
+import { locales, localeMeta } from '@/lib/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,9 +26,13 @@ const cards = [
 ] as const
 
 export default async function AdminDashboard() {
-  const [counts, newInquiries] = await Promise.all([
+  const [counts, newInquiries, localeDebug, localeCounts] = await Promise.all([
     getCounts(),
     countNewInquiries(),
+    getLocaleDebug(),
+    Promise.all(
+      locales.map(async (l) => ({ locale: l, counts: await getLocaleContentCounts(l) })),
+    ),
   ])
 
   return (
@@ -69,6 +79,80 @@ export default async function AdminDashboard() {
           )
         })}
       </div>
+
+      <section
+        aria-label="Localization debug"
+        className="rounded-xl border border-border bg-card p-6"
+      >
+        <h2 className="font-heading text-lg font-semibold text-foreground">
+          Localization debug
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Admin-only diagnostics. Not shown on the public site.
+        </p>
+
+        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Detected host
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground">
+              {localeDebug.host ?? 'unknown'}
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Resolved locale
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground">
+              {localeDebug.locale}
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Resolved via
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground">
+              {localeDebug.source}
+            </dd>
+          </div>
+        </dl>
+
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-border text-xs uppercase tracking-wide text-muted-foreground">
+                <th className="py-2 pr-4 font-medium">Locale</th>
+                <th className="py-2 pr-4 font-medium">Domain</th>
+                <th className="py-2 pr-4 font-medium">Services</th>
+                <th className="py-2 pr-4 font-medium">Projects</th>
+                <th className="py-2 pr-4 font-medium">Packages</th>
+                <th className="py-2 pr-4 font-medium">Sections</th>
+                <th className="py-2 font-medium">Settings</th>
+              </tr>
+            </thead>
+            <tbody>
+              {localeCounts.map(({ locale, counts: c }) => (
+                <tr key={locale} className="border-b border-border/50">
+                  <td className="py-2 pr-4 font-mono text-foreground">{locale}</td>
+                  <td className="py-2 pr-4 font-mono text-muted-foreground">
+                    {localeMeta[locale].domain}
+                  </td>
+                  <td className="py-2 pr-4 text-foreground">{c.services}</td>
+                  <td className="py-2 pr-4 text-foreground">{c.projects}</td>
+                  <td className="py-2 pr-4 text-foreground">{c.packages}</td>
+                  <td className="py-2 pr-4 text-foreground">{c.sections}</td>
+                  <td className="py-2 text-foreground">{c.settings}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="mt-3 text-xs text-muted-foreground">
+            A locale with 0 rows for a content type falls back to English/seed
+            content on its domain. Sections fall back to built-in copy when empty.
+          </p>
+        </div>
+      </section>
     </div>
   )
 }

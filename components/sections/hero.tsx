@@ -8,11 +8,11 @@ export function Hero() {
       {/* Ghosted luxury fox watermark — pushed far right/lower, mostly off-canvas,
           intentionally behind everything and never directly behind the logo. */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute right-[-22%] top-[62%] h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-gold/8 blur-[150px]" />
+        <div className="absolute right-[2%] top-[58%] h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-gold/8 blur-[150px]" />
         <BrandLogo
           variant="emblem"
           decorative
-          className="absolute right-[-20%] top-[64%] h-[760px] w-[760px] -translate-y-1/2 object-contain opacity-[0.035]"
+          className="absolute right-[4%] top-[60%] h-[700px] w-[700px] -translate-y-1/2 object-contain opacity-[0.04]"
         />
       </div>
       {/* Thin gold top accent line */}

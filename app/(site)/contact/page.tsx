@@ -3,6 +3,8 @@ import { Mail, MapPin, Phone } from 'lucide-react'
 import { PageHero } from '@/components/page-hero'
 import { ContactForm } from '@/components/contact-form'
 import { faqs, site } from '@/lib/content'
+import { getLocale } from '@/lib/i18n/server'
+import { getDictionary } from '@/lib/i18n/dictionaries'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -36,7 +38,9 @@ const details = [
   },
 ]
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const locale = await getLocale()
+  const t = getDictionary(locale)
   return (
     <>
       <PageHero
@@ -71,7 +75,7 @@ export default function ContactPage() {
             </div>
           </div>
 
-          <ContactForm />
+          <ContactForm t={t.contact} />
         </div>
       </section>
 

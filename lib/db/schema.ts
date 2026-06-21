@@ -176,6 +176,9 @@ export const media = pgTable('media', {
   contentType: text('content_type'),
   size: integer('size'),
   alt: text('alt'),
+  caption: text('caption'),
+  width: integer('width'),
+  height: integer('height'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 })
 

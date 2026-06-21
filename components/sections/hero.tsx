@@ -5,22 +5,23 @@ import { site } from '@/lib/content'
 export function Hero() {
   return (
     <section className="relative overflow-hidden">
-      {/* Large background emblem watermark + soft golden aura (off to the right) */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute right-[-12%] top-1/2 h-[640px] w-[640px] -translate-y-1/2 rounded-full bg-gold/10 blur-[140px]" />
+      {/* Ghosted luxury fox watermark — pushed far right/lower, mostly off-canvas,
+          intentionally behind everything and never directly behind the logo. */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute right-[-22%] top-[62%] h-[520px] w-[520px] -translate-y-1/2 rounded-full bg-gold/8 blur-[150px]" />
         <BrandLogo
           variant="emblem"
           decorative
-          className="absolute right-[-10%] top-1/2 h-[680px] w-[680px] -translate-y-1/2 object-contain opacity-[0.07]"
+          className="absolute right-[-20%] top-[64%] h-[760px] w-[760px] -translate-y-1/2 object-contain opacity-[0.035]"
         />
       </div>
       {/* Thin gold top accent line */}
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 z-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 pt-20 pb-24 sm:px-8 sm:pt-28 sm:pb-32 lg:min-h-[90vh] lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 pt-20 pb-24 sm:px-8 sm:pt-28 sm:pb-32 lg:min-h-[90vh] lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         {/* Left: copy */}
         <div className="flex flex-col gap-8">
           <span className="inline-flex w-fit items-center gap-2.5 rounded-full border border-gold/30 bg-espresso/60 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-gold backdrop-blur">

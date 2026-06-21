@@ -3,6 +3,7 @@ import { ResourceForm } from '@/components/admin/resource-form'
 import { DeleteButton } from '@/components/admin/delete-button'
 import { TextField, AreaField, ToggleField } from '@/components/admin/form-fields'
 import { ImageUrlField } from '@/components/admin/image-url-field'
+import { GalleryEditor } from '@/components/admin/gallery-editor'
 import { listProjects } from '@/lib/admin/queries'
 import { saveProject, deleteProject } from '@/app/actions/admin'
 import { localeFromParam, type Locale } from '@/lib/i18n/config'
@@ -22,7 +23,10 @@ function Fields({ row }: { row?: Row }) {
         <AreaField name="description" label="Description" defaultValue={row?.description} rows={3} />
       </div>
       <div className="sm:col-span-2">
-        <ImageUrlField name="imageUrl" label="Image URL" defaultValue={row?.imageUrl} hint="Paste a URL from the Media library" />
+        <ImageUrlField name="imageUrl" label="Cover image URL" defaultValue={row?.imageUrl} hint="Main/cover image. If empty, the first gallery image is used." />
+      </div>
+      <div className="sm:col-span-2 border-t border-border pt-4">
+        <GalleryEditor defaultValue={row?.gallery} />
       </div>
       <TextField name="sortOrder" label="Sort order" defaultValue={String(row?.sortOrder ?? 0)} />
       <ToggleField name="isPublished" label="Published" defaultChecked={row?.isPublished ?? true} />

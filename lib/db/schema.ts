@@ -125,6 +125,8 @@ export const projects = pgTable(
     category: text('category'),
     description: text('description'),
     imageUrl: text('image_url'),
+    /** Ordered gallery images (see GalleryImage in lib/portfolio.ts). */
+    gallery: jsonb('gallery').notNull().default([]),
     url: text('url'),
     sortOrder: integer('sort_order').notNull().default(0),
     isPublished: boolean('is_published').notNull().default(true),

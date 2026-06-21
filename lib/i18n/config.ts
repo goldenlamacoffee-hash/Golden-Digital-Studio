@@ -15,7 +15,7 @@ export const LOCALE_COOKIE = 'gds_locale'
 export const ownedDomainsByLocale: Record<Locale, readonly string[]> = {
   'cs-CZ': ['goldendigital.cz', 'goldendigitalstudio.cz', 'goldenstudio.cz'],
   'sk-SK': ['goldendigital.sk', 'goldendigitalstudio.sk', 'goldenstudio.sk'],
-  en: ['goldendigital.online', 'goldenstudio.online', 'gdstudio.online'],
+  en: ['goldenstudio.online', 'gdstudio.online'],
 }
 
 /**
@@ -25,7 +25,7 @@ export const ownedDomainsByLocale: Record<Locale, readonly string[]> = {
  * domains still render and self-canonicalize.
  */
 export const representativeDomain: Record<Locale, string> = {
-  en: 'goldendigital.online',
+  en: 'goldenstudio.online',
   'cs-CZ': 'goldendigital.cz',
   'sk-SK': 'goldendigital.sk',
 }
@@ -51,6 +51,20 @@ export const domainLocaleMap: Record<string, Locale> = (() => {
   }
   return map
 })()
+
+/**
+ * Every owned hostname (bare + `www.`), flat list. Single source of truth for
+ * both locale resolution and auth trusted origins so the two never drift apart.
+ */
+export const ownedHosts: readonly string[] = Object.keys(domainLocaleMap)
+
+/**
+ * `https://` origins for every owned domain. Used to populate Better Auth's
+ * `trustedOrigins` so admin login works on ALL owned production domains.
+ */
+export const ownedOrigins: readonly string[] = ownedHosts.map(
+  (host) => `https://${host}`,
+)
 
 /** Normalize a raw Host header: drop the port, lowercase. */
 function normalizeHost(host: string | undefined | null): string | null {
@@ -83,7 +97,7 @@ export const localeMeta: Record<
     label: 'English',
     shortLabel: 'EN',
     htmlLang: 'en',
-    domain: 'goldendigital.online',
+    domain: 'goldenstudio.online',
   },
   'cs-CZ': {
     label: 'Čeština',

@@ -1,8 +1,8 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Raleway, Geist_Mono } from 'next/font/google'
-import { getLocale } from '@/lib/i18n/server'
-import { localeMeta, localeOrigin } from '@/lib/i18n/config'
+import { getLocale, getRequestOrigin } from '@/lib/i18n/server'
+import { localeMeta, localeOrigin, xDefaultOrigin } from '@/lib/i18n/config'
 import './globals.css'
 
 const ogLocaleMap: Record<string, string> = {
@@ -30,7 +30,9 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale()
-  const canonical = localeOrigin(locale)
+  // Canonical reflects the CURRENT owned host (each domain stays live and
+  // self-canonical); hreflang points at the representative domains.
+  const canonical = await getRequestOrigin()
 
   return {
     metadataBase: new URL(canonical),
@@ -59,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
         en: localeOrigin('en'),
         'cs-CZ': localeOrigin('cs-CZ'),
         'sk-SK': localeOrigin('sk-SK'),
-        'x-default': localeOrigin('en'),
+        'x-default': xDefaultOrigin,
       },
     },
     openGraph: {

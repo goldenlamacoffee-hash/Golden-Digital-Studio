@@ -102,28 +102,18 @@ export default async function AdminDashboard() {
           </div>
           <div className="rounded-lg border border-border/60 p-3">
             <dt className="text-xs uppercase tracking-wide text-muted-foreground">
-              Host type
+              Owned domain
             </dt>
             <dd className="mt-1 flex items-center gap-2">
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-xs ${
-                  hostDebug.kind === 'canonical'
+                  hostDebug.owned
                     ? 'bg-gold/15 text-gold'
-                    : hostDebug.kind === 'alias'
-                      ? 'bg-amber-500/15 text-amber-500'
-                      : 'bg-muted text-muted-foreground'
+                    : 'bg-muted text-muted-foreground'
                 }`}
               >
-                {hostDebug.kind}
+                {hostDebug.owned ? 'yes' : 'no (localhost/preview)'}
               </span>
-            </dd>
-          </div>
-          <div className="rounded-lg border border-border/60 p-3">
-            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
-              Canonical domain
-            </dt>
-            <dd className="mt-1 font-mono text-sm text-foreground">
-              {hostDebug.canonicalHost ?? '—'}
             </dd>
           </div>
           <div className="rounded-lg border border-border/60 p-3">
@@ -144,10 +134,20 @@ export default async function AdminDashboard() {
           </div>
           <div className="rounded-lg border border-border/60 p-3">
             <dt className="text-xs uppercase tracking-wide text-muted-foreground">
-              Redirect target
+              SEO representative
             </dt>
             <dd className="mt-1 font-mono text-sm text-foreground break-all">
-              {hostDebug.redirectTarget ?? 'none (canonical)'}
+              {hostDebug.representativeDomain}
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              App-level redirects
+            </dt>
+            <dd className="mt-1 flex items-center gap-2">
+              <span className="inline-flex items-center rounded-full bg-gold/15 px-2 py-0.5 font-mono text-xs text-gold">
+                disabled
+              </span>
             </dd>
           </div>
         </dl>

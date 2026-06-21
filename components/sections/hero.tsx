@@ -1,8 +1,12 @@
 import { CtaLink } from '@/components/cta-link'
 import { BrandLogo } from '@/components/brand-logo'
 import { site } from '@/lib/content'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import { getDictionary } from '@/lib/i18n/dictionaries'
 
-export function Hero() {
+export function Hero({ locale = defaultLocale }: { locale?: Locale }) {
+  const t = getDictionary(locale)
   return (
     <section className="relative overflow-hidden">
       {/* Ghosted luxury fox watermark — pushed far right/lower, mostly off-canvas,
@@ -26,31 +30,31 @@ export function Hero() {
         <div className="flex flex-col gap-8">
           <span className="inline-flex w-fit items-center gap-2.5 rounded-full border border-gold/30 bg-espresso/60 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-gold backdrop-blur">
             <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
-            A digital studio by {site.parent}
+            {t.hero.badge} {site.parent}
           </span>
 
           <h1 className="max-w-3xl font-heading text-4xl font-semibold leading-[1.04] tracking-tight text-balance text-sand sm:text-5xl lg:text-[4rem]">
-            Websites, apps and AI systems for{' '}
-            <span className="text-gold">ambitious small businesses.</span>
+            {t.hero.titleLead}{' '}
+            <span className="text-gold">{t.hero.titleHighlight}</span>
           </h1>
 
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            {site.description}
+            {t.hero.description}
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <CtaLink href="/contact" size="lg">
-              Start a project
+              {t.cta.primary}
             </CtaLink>
             <CtaLink href="/services" size="lg" variant="outline">
-              See what we build
+              {t.cta.secondary}
             </CtaLink>
           </div>
 
           <div className="mt-2 flex items-center gap-4">
             <span className="h-px w-10 bg-gold/40" aria-hidden="true" />
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              {site.tagline}
+              {t.hero.tagline}
             </p>
           </div>
         </div>

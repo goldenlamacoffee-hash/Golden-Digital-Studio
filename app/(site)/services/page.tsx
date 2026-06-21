@@ -5,6 +5,9 @@ import { Process } from '@/components/sections/process'
 import { Packages } from '@/components/sections/packages'
 import { AiTraining } from '@/components/sections/ai-training'
 import { CtaSection } from '@/components/sections/cta-section'
+import { getLocale } from '@/lib/i18n/server'
+import { getDictionary } from '@/lib/i18n/dictionaries'
+import { getServices, getPackages } from '@/lib/cms/queries'
 
 export const metadata: Metadata = {
   title: 'Services',
@@ -17,7 +20,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const locale = await getLocale()
+  const t = getDictionary(locale)
+  const [services, packages] = await Promise.all([
+    getServices(locale),
+    getPackages(locale),
+  ])
+
   return (
     <>
       <PageHero
@@ -25,9 +35,14 @@ export default function ServicesPage() {
         title="Digital systems, built to work together."
         description="From your first modern website to portals, apps and AI workflows — Golden Digital Studio delivers the systems ambitious small businesses need, with a CMS-first, AI-assisted approach."
       />
-      <ServicesSection detailed flush />
+      <ServicesSection
+        detailed
+        flush
+        items={services}
+        heading={t.sections.services}
+      />
       <Process />
-      <Packages />
+      <Packages items={packages} heading={t.sections.packages} />
       <AiTraining />
       <CtaSection />
     </>

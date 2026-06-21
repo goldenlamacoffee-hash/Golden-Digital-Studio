@@ -1,13 +1,31 @@
 import { SectionHeading } from '@/components/section-heading'
 import { FoxWatermark } from '@/components/fox-watermark'
-import { projects } from '@/lib/content'
+import { projects as seedProjects } from '@/lib/content'
+import type { ProjectItem } from '@/lib/cms/queries'
 import { cn } from '@/lib/utils'
 
 type PortfolioSectionProps = {
   flush?: boolean
+  items?: ProjectItem[]
+  heading?: { eyebrow?: string; title?: string; description?: string }
 }
 
-export function PortfolioSection({ flush }: PortfolioSectionProps) {
+export function PortfolioSection({
+  flush,
+  items,
+  heading,
+}: PortfolioSectionProps) {
+  const projects: ProjectItem[] =
+    items ??
+    seedProjects.map((p) => ({
+      slug: p.slug,
+      name: p.name,
+      category: p.category,
+      description: p.description,
+      imageUrl: null,
+      url: null,
+    }))
+
   return (
     <section
       id="portfolio"
@@ -24,9 +42,12 @@ export function PortfolioSection({ flush }: PortfolioSectionProps) {
       />
       <div className="relative mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <SectionHeading
-          eyebrow="Portfolio"
-          title="Proof in real systems and brands."
-          description="Selected work across websites, portals and apps. Built to perform and ready for the next phase."
+          eyebrow={heading?.eyebrow ?? 'Portfolio'}
+          title={heading?.title ?? 'Proof in real systems and brands.'}
+          description={
+            heading?.description ??
+            'Selected work across websites, portals and apps. Built to perform and ready for the next phase.'
+          }
         />
 
         <div className="mt-12 grid gap-5 md:grid-cols-2">
@@ -70,12 +91,16 @@ export function PortfolioSection({ flush }: PortfolioSectionProps) {
                 </p>
               </div>
 
-              <p className="border-t border-gold/10 pt-4 text-sm text-sand/80">
-                <span className="font-mono text-xs uppercase tracking-[0.2em] text-gold">
-                  Outcome —{' '}
-                </span>
-                {project.outcome}
-              </p>
+              {project.url ? (
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border-t border-gold/10 pt-4 font-mono text-xs uppercase tracking-[0.2em] text-gold transition-colors hover:text-warm-gold"
+                >
+                  Visit project →
+                </a>
+              ) : null}
             </article>
           ))}
         </div>

@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { BrandLogo } from '@/components/brand-logo'
 import { FoxWatermark } from '@/components/fox-watermark'
 import { services, site } from '@/lib/content'
+import type { Locale } from '@/lib/i18n/config'
+import type { Dictionary } from '@/lib/i18n/dictionaries'
 
 const footerCols: { title: string; links: { label: string; href: string }[] }[] =
   [
@@ -32,8 +34,15 @@ const footerCols: { title: string; links: { label: string; href: string }[] }[] 
     },
   ]
 
-export function SiteFooter() {
+export function SiteFooter({
+  locale,
+  dict,
+}: {
+  locale: Locale
+  dict: Dictionary
+}) {
   void services
+  void locale
   return (
     <footer className="relative overflow-hidden border-t border-gold/15 bg-espresso">
       <FoxWatermark
@@ -89,7 +98,7 @@ export function SiteFooter() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-gold/10 pt-8 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
-            &copy; {new Date().getFullYear()} {site.name}. All rights reserved.
+            &copy; {new Date().getFullYear()} {site.name}. {dict.footer.rights}
           </p>
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold/70">
             {site.shortTagline}

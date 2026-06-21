@@ -2,8 +2,14 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Inter, Raleway, Geist_Mono } from 'next/font/google'
 import { getLocale } from '@/lib/i18n/server'
-import { localeMeta } from '@/lib/i18n/config'
+import { localeMeta, localeOrigin } from '@/lib/i18n/config'
 import './globals.css'
+
+const ogLocaleMap: Record<string, string> = {
+  en: 'en_US',
+  'cs-CZ': 'cs_CZ',
+  'sk-SK': 'sk_SK',
+}
 
 const inter = Inter({
   variable: '--font-inter',
@@ -22,53 +28,65 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-const siteUrl = 'https://goldendigitalstudio.com'
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale()
+  const canonical = localeOrigin(locale)
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
-    template: '%s · Golden Digital Studio',
-  },
-  description:
-    'Golden Digital Studio builds practical digital systems — websites with CMS, B2B portals, mobile apps, automations and AI workflows — for ambitious small businesses. A digital studio by LMVK Group.',
-  generator: 'v0.app',
-  keywords: [
-    'digital studio',
-    'web development',
-    'CMS',
-    'B2B portals',
-    'mobile apps',
-    'AI workflows',
-    'business automation',
-    'LMVK Group',
-  ],
-  authors: [{ name: 'Golden Digital Studio' }],
-  creator: 'Golden Digital Studio',
-  openGraph: {
-    type: 'website',
-    locale: 'en',
-    url: siteUrl,
-    siteName: 'Golden Digital Studio',
-    title: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
+  return {
+    metadataBase: new URL(canonical),
+    title: {
+      default: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
+      template: '%s · Golden Digital Studio',
+    },
     description:
-      'Websites, apps and AI systems for ambitious small businesses. A digital studio by LMVK Group.',
-    images: [
-      {
-        url: '/brand/gds-fox-og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
-      },
+      'Golden Digital Studio builds practical digital systems — websites with CMS, B2B portals, mobile apps, automations and AI workflows — for ambitious small businesses. A digital studio by LMVK Group.',
+    generator: 'v0.app',
+    keywords: [
+      'digital studio',
+      'web development',
+      'CMS',
+      'B2B portals',
+      'mobile apps',
+      'AI workflows',
+      'business automation',
+      'LMVK Group',
     ],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
-    description:
-      'Websites, apps and AI systems for ambitious small businesses. A digital studio by LMVK Group.',
-    images: ['/brand/gds-fox-og-image.png'],
-  },
+    authors: [{ name: 'Golden Digital Studio' }],
+    creator: 'Golden Digital Studio',
+    alternates: {
+      canonical,
+      languages: {
+        en: localeOrigin('en'),
+        'cs-CZ': localeOrigin('cs-CZ'),
+        'sk-SK': localeOrigin('sk-SK'),
+        'x-default': localeOrigin('en'),
+      },
+    },
+    openGraph: {
+      type: 'website',
+      locale: ogLocaleMap[locale],
+      url: canonical,
+      siteName: 'Golden Digital Studio',
+      title: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
+      description:
+        'Websites, apps and AI systems for ambitious small businesses. A digital studio by LMVK Group.',
+      images: [
+        {
+          url: '/brand/gds-fox-og-image.png',
+          width: 1200,
+          height: 630,
+          alt: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
+      description:
+        'Websites, apps and AI systems for ambitious small businesses. A digital studio by LMVK Group.',
+      images: ['/brand/gds-fox-og-image.png'],
+    },
+  }
 }
 
 export const viewport: Viewport = {

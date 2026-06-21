@@ -3,7 +3,13 @@
 import { useTransition } from 'react'
 import { Check, Globe } from 'lucide-react'
 import { setLocale } from '@/app/actions/locale'
-import { locales, localeMeta, type Locale } from '@/lib/i18n/config'
+import {
+  locales,
+  localeMeta,
+  localeOrigin,
+  isProductionHost,
+  type Locale,
+} from '@/lib/i18n/config'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +23,16 @@ export function LocaleSwitcher({ current }: { current: Locale }) {
 
   function handleSelect(locale: Locale) {
     if (locale === current) return
+
+    // In production, locale is owned by the domain — switch by navigating to the
+    // equivalent domain, preserving the current path + query.
+    if (typeof window !== 'undefined' && isProductionHost(window.location.hostname)) {
+      const { pathname, search } = window.location
+      window.location.href = `${localeOrigin(locale)}${pathname}${search}`
+      return
+    }
+
+    // Localhost / preview: no domain mapping, so fall back to the cookie.
     startTransition(() => {
       void setLocale(locale)
     })

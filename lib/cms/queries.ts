@@ -10,6 +10,7 @@ import {
 import type { Locale } from '@/lib/i18n/config'
 import { defaultLocale } from '@/lib/i18n/config'
 import * as seed from '@/lib/content'
+import { parseGallery, type GalleryImage } from '@/lib/portfolio'
 
 /**
  * CMS read layer. Each getter returns published rows for the active locale.
@@ -114,6 +115,7 @@ export type ProjectItem = {
   category: string
   description: string
   imageUrl: string | null
+  gallery: GalleryImage[]
   url: string | null
 }
 
@@ -124,6 +126,7 @@ function seedProjects(): ProjectItem[] {
     category: p.category,
     description: p.description,
     imageUrl: null,
+    gallery: [],
     url: null,
   }))
 }
@@ -147,10 +150,47 @@ export async function getProjects(locale: Locale): Promise<ProjectItem[]> {
       category: r.category ?? '',
       description: r.description ?? '',
       imageUrl: r.imageUrl,
+      gallery: parseGallery(r.gallery),
       url: r.url,
     }))
   } catch {
     return seedProjects()
+  }
+}
+
+/**
+ * Single published project by slug for the case-study detail page. Returns null
+ * when not found (the page renders a 404). Never throws.
+ */
+export async function getProject(
+  locale: Locale,
+  slug: string,
+): Promise<ProjectItem | null> {
+  try {
+    const rows = await db
+      .select()
+      .from(projectsTable)
+      .where(
+        and(
+          eq(projectsTable.locale, locale),
+          eq(projectsTable.slug, slug),
+          eq(projectsTable.isPublished, true),
+        ),
+      )
+      .limit(1)
+    const r = rows[0]
+    if (!r) return null
+    return {
+      slug: r.slug,
+      name: r.name,
+      category: r.category ?? '',
+      description: r.description ?? '',
+      imageUrl: r.imageUrl,
+      gallery: parseGallery(r.gallery),
+      url: r.url,
+    }
+  } catch {
+    return null
   }
 }
 

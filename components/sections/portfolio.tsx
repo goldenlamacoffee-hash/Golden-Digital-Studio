@@ -1,33 +1,17 @@
-import Image from 'next/image'
+import Link from 'next/link'
+import { Images } from 'lucide-react'
 import { SectionHeading } from '@/components/section-heading'
 import { FoxWatermark } from '@/components/fox-watermark'
+import { PortfolioImage } from '@/components/portfolio-image'
 import { projects as seedProjects } from '@/lib/content'
 import type { ProjectItem } from '@/lib/cms/queries'
-import { getProjectImage, isValidExternalUrl } from '@/lib/portfolio'
+import { resolveCardImage, isValidExternalUrl } from '@/lib/portfolio'
 import { cn } from '@/lib/utils'
 
 type PortfolioSectionProps = {
   flush?: boolean
   items?: ProjectItem[]
   heading?: { eyebrow?: string; title?: string; description?: string }
-}
-
-/** Luxury fallback when a project has no image: gold gradient + fox watermark. */
-function ProjectPlaceholder({ featured }: { featured?: boolean }) {
-  return (
-    <div
-      aria-hidden="true"
-      className="relative h-full w-full overflow-hidden bg-gradient-to-br from-espresso via-card to-background"
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(212,175,55,0.18),transparent_60%)]" />
-      <FoxWatermark
-        position={featured ? 'right-[-6%] top-1/2 -translate-y-1/2' : 'left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2'}
-        size={featured ? 'h-[360px] w-[360px]' : 'h-[220px] w-[220px]'}
-        opacity="opacity-[0.08]"
-        glow={false}
-      />
-    </div>
-  )
 }
 
 export function PortfolioSection({
@@ -43,6 +27,7 @@ export function PortfolioSection({
       category: p.category,
       description: p.description,
       imageUrl: null,
+      gallery: [],
       url: null,
     }))
 
@@ -73,8 +58,10 @@ export function PortfolioSection({
         <div className="mt-12 grid gap-5 md:grid-cols-2">
           {projects.map((project, index) => {
             const featured = index === 0
-            const image = getProjectImage(project)
+            const card = resolveCardImage(project)
             const showLink = isValidExternalUrl(project.url)
+            const galleryCount = project.gallery.length
+
             return (
               <article
                 key={project.slug}
@@ -88,24 +75,26 @@ export function PortfolioSection({
                   aria-hidden="true"
                 />
 
-                {/* Visual area — image if present, otherwise luxury placeholder */}
-                <div
-                  className={cn(
-                    'relative w-full overflow-hidden border-b border-gold/10',
-                    featured ? 'aspect-[16/7]' : 'aspect-[16/10]',
-                  )}
+                {/* Stretched link makes the whole card open the case study. */}
+                <Link
+                  href={`/portfolio/${project.slug}`}
+                  className="absolute inset-0 z-10 rounded-[1.25rem] focus:outline-none focus-visible:ring-2 focus-visible:ring-gold"
                 >
-                  {image ? (
-                    <Image
-                      src={image || '/placeholder.svg'}
-                      alt={project.name}
-                      fill
-                      sizes={featured ? '100vw' : '(min-width: 768px) 50vw, 100vw'}
-                      className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                    />
-                  ) : (
-                    <ProjectPlaceholder featured={featured} />
-                  )}
+                  <span className="sr-only">View {project.name} case study</span>
+                </Link>
+
+                {/* Visual area — gallery/cover image, or luxury placeholder */}
+                <div className="relative w-full overflow-hidden border-b border-gold/10">
+                  <PortfolioImage
+                    url={card?.url ?? null}
+                    alt={project.name}
+                    displayMode={card?.displayMode ?? 'cover'}
+                    position={card?.position ?? 'center'}
+                    boxRatioClass={featured ? 'aspect-[16/8]' : 'aspect-[16/10]'}
+                    sizes={featured ? '100vw' : '(min-width: 768px) 50vw, 100vw'}
+                    hoverZoom={card?.displayMode !== 'contain'}
+                    priority={featured}
+                  />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-background/10 to-transparent" />
                   <span className="absolute left-4 top-4 inline-flex items-center rounded-full border border-gold/25 bg-espresso/70 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-gold backdrop-blur-sm">
                     {featured ? 'Signature work' : project.category}
@@ -113,6 +102,12 @@ export function PortfolioSection({
                   <span className="absolute right-4 top-4 font-mono text-xs text-sand/70">
                     {String(index + 1).padStart(2, '0')}
                   </span>
+                  {galleryCount > 1 ? (
+                    <span className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 rounded-full border border-gold/25 bg-espresso/70 px-2.5 py-1 font-mono text-[11px] text-sand/80 backdrop-blur-sm">
+                      <Images className="size-3.5 text-gold" aria-hidden="true" />
+                      {galleryCount}
+                    </span>
+                  ) : null}
                 </div>
 
                 <div className="flex flex-1 flex-col gap-3 p-8">
@@ -132,16 +127,21 @@ export function PortfolioSection({
                   <p className="text-pretty leading-relaxed text-muted-foreground">
                     {project.description}
                   </p>
-                  {showLink ? (
-                    <a
-                      href={project.url as string}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-auto inline-flex w-fit items-center gap-1.5 pt-4 font-mono text-xs uppercase tracking-[0.2em] text-gold transition-colors hover:text-warm-gold"
-                    >
-                      View project →
-                    </a>
-                  ) : null}
+                  <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-4">
+                    <span className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] text-gold transition-colors group-hover:text-warm-gold">
+                      View case study →
+                    </span>
+                    {showLink ? (
+                      <a
+                        href={project.url as string}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="relative z-20 inline-flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] text-sand/60 transition-colors hover:text-gold"
+                      >
+                        Visit site ↗
+                      </a>
+                    ) : null}
+                  </div>
                 </div>
               </article>
             )

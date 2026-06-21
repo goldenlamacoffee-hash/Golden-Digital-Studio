@@ -15,6 +15,7 @@ import {
 } from '@/lib/db/schema'
 import { requireAdmin } from '@/lib/admin/guard'
 import { isLocale, defaultLocale, type Locale } from '@/lib/i18n/config'
+import { parseGallery } from '@/lib/portfolio'
 
 /* ------------------------------- helpers ------------------------------- */
 
@@ -91,6 +92,8 @@ export async function saveProject(formData: FormData) {
     category: optStr(formData.get('category')),
     description: optStr(formData.get('description')),
     imageUrl: optStr(formData.get('imageUrl')),
+    // Re-parse on the server so only valid, normalized gallery entries persist.
+    gallery: parseGallery(str(formData.get('gallery'))),
     url: optStr(formData.get('url')),
     sortOrder: int(formData.get('sortOrder')),
     isPublished: bool(formData.get('isPublished')),

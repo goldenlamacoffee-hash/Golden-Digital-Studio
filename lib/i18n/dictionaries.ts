@@ -5,6 +5,18 @@ import type { Locale } from './config'
  * database; this dictionary only covers static interface text.
  */
 export type Dictionary = {
+  hero: {
+    badge: string
+    titleLead: string
+    titleHighlight: string
+    description: string
+    tagline: string
+  }
+  sections: {
+    services: { eyebrow: string; title: string; description: string }
+    portfolio: { eyebrow: string; title: string; description: string }
+    packages: { eyebrow: string; title: string; description: string }
+  }
   nav: {
     services: string
     portfolio: string
@@ -37,6 +49,34 @@ export type Dictionary = {
 }
 
 const en: Dictionary = {
+  hero: {
+    badge: 'A digital studio by',
+    titleLead: 'Websites, apps and AI systems for',
+    titleHighlight: 'ambitious small businesses.',
+    description:
+      'Golden Digital Studio builds practical digital systems — websites with CMS, B2B portals, mobile apps, automations and AI workflows — under LMVK Group.',
+    tagline: 'Digital systems. AI workflows. Impact.',
+  },
+  sections: {
+    services: {
+      eyebrow: 'Services',
+      title: 'Everything you need to run a modern digital business.',
+      description:
+        'One studio for the systems that matter — built to work together and easy to maintain.',
+    },
+    portfolio: {
+      eyebrow: 'Portfolio',
+      title: 'Proof in real systems and brands.',
+      description:
+        'Selected work across websites, portals and apps. Built to perform and ready for the next phase.',
+    },
+    packages: {
+      eyebrow: 'Packages',
+      title: 'Engagements scoped to where you are.',
+      description:
+        'Transparent starting points — every project is tailored after a short discovery call.',
+    },
+  },
   nav: {
     services: 'Services',
     portfolio: 'Portfolio',
@@ -69,6 +109,34 @@ const en: Dictionary = {
 }
 
 const cs: Dictionary = {
+  hero: {
+    badge: 'Digitální studio od',
+    titleLead: 'Weby, aplikace a AI systémy pro',
+    titleHighlight: 'ambiciózní malé firmy.',
+    description:
+      'Golden Digital Studio staví praktické digitální systémy — weby s CMS, B2B portály, mobilní aplikace, automatizace a AI workflow — pod LMVK Group.',
+    tagline: 'Digitální systémy. AI workflow. Výsledky.',
+  },
+  sections: {
+    services: {
+      eyebrow: 'Služby',
+      title: 'Vše, co potřebujete k provozu moderní digitální firmy.',
+      description:
+        'Jedno studio pro systémy, na kterých záleží — navržené tak, aby fungovaly společně a snadno se udržovaly.',
+    },
+    portfolio: {
+      eyebrow: 'Portfolio',
+      title: 'Důkaz v reálných systémech a značkách.',
+      description:
+        'Vybrané práce napříč weby, portály a aplikacemi. Postavené na výkon a připravené na další fázi.',
+    },
+    packages: {
+      eyebrow: 'Balíčky',
+      title: 'Spolupráce přizpůsobená tomu, kde se nacházíte.',
+      description:
+        'Transparentní výchozí body — každý projekt je upraven po krátké úvodní konzultaci.',
+    },
+  },
   nav: {
     services: 'Služby',
     portfolio: 'Portfolio',
@@ -101,6 +169,34 @@ const cs: Dictionary = {
 }
 
 const sk: Dictionary = {
+  hero: {
+    badge: 'Digitálne štúdio od',
+    titleLead: 'Weby, aplikácie a AI systémy pre',
+    titleHighlight: 'ambiciózne malé firmy.',
+    description:
+      'Golden Digital Studio stavia praktické digitálne systémy — weby s CMS, B2B portály, mobilné aplikácie, automatizácie a AI workflow — pod LMVK Group.',
+    tagline: 'Digitálne systémy. AI workflow. Výsledky.',
+  },
+  sections: {
+    services: {
+      eyebrow: 'Služby',
+      title: 'Všetko, čo potrebujete na prevádzku modernej digitálnej firmy.',
+      description:
+        'Jedno štúdio pre systémy, na ktorých záleží — navrhnuté tak, aby fungovali spoločne a ľahko sa udržiavali.',
+    },
+    portfolio: {
+      eyebrow: 'Portfólio',
+      title: 'Dôkaz v reálnych systémoch a značkách.',
+      description:
+        'Vybrané práce naprieč webmi, portálmi a aplikáciami. Postavené na výkon a pripravené na ďalšiu fázu.',
+    },
+    packages: {
+      eyebrow: 'Balíky',
+      title: 'Spolupráca prispôsobená tomu, kde sa nachádzate.',
+      description:
+        'Transparentné východiskové body — každý projekt je upravený po krátkej úvodnej konzultácii.',
+    },
+  },
   nav: {
     services: 'Služby',
     portfolio: 'Portfólio',

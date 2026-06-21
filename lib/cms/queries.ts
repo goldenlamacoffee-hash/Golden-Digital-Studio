@@ -164,6 +164,10 @@ export type PackageItem = {
   ctaLabel: string | null
 }
 
+export function getPackagesSeed(): PackageItem[] {
+  return seedPackages()
+}
+
 function seedPackages(): PackageItem[] {
   return seed.packages.map((p, i) => ({
     slug: p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),

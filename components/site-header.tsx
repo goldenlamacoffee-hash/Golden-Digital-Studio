@@ -6,13 +6,27 @@ import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
 import { BrandLockupLink } from '@/components/brand-logo'
 import { CtaLink } from '@/components/cta-link'
-import { nav } from '@/lib/content'
+import { LocaleSwitcher } from '@/components/locale-switcher'
+import type { Locale } from '@/lib/i18n/config'
+import type { Dictionary } from '@/lib/i18n/dictionaries'
 import { cn } from '@/lib/utils'
 
-export function SiteHeader() {
+export function SiteHeader({
+  locale,
+  dict,
+}: {
+  locale: Locale
+  dict: Dictionary
+}) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+
+  const nav = [
+    { label: dict.nav.services, href: '/services' },
+    { label: dict.nav.portfolio, href: '/portfolio' },
+    { label: dict.nav.contact, href: '/contact' },
+  ]
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12)
@@ -58,9 +72,10 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-3 md:flex">
+          <LocaleSwitcher current={locale} />
           <CtaLink href="/contact" size="sm">
-            Start a project
+            {dict.cta.primary}
           </CtaLink>
         </div>
 
@@ -104,8 +119,11 @@ export function SiteHeader() {
               )
             })}
             <CtaLink href="/contact" className="mt-2 w-full">
-              Start a project
+              {dict.cta.primary}
             </CtaLink>
+            <div className="mt-3 flex justify-center">
+              <LocaleSwitcher current={locale} />
+            </div>
           </nav>
         </div>
       ) : null}

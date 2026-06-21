@@ -55,10 +55,10 @@ export const metadata: Metadata = {
       'Websites, apps and AI systems for ambitious small businesses. A digital studio by LMVK Group.',
     images: [
       {
-        url: '/brand/fox-lockup.png',
-        width: 751,
-        height: 371,
-        alt: 'Golden Digital Studio',
+        url: '/brand/gds-fox-og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
       },
     ],
   },
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     title: 'Golden Digital Studio — Digital systems. AI workflows. Impact.',
     description:
       'Websites, apps and AI systems for ambitious small businesses. A digital studio by LMVK Group.',
-    images: ['/brand/fox-lockup.png'],
+    images: ['/brand/gds-fox-og-image.png'],
   },
 }
 

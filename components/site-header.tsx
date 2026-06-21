@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
-import { FoxLogo } from '@/components/fox-logo'
+import { BrandLockupLink } from '@/components/brand-logo'
 import { CtaLink } from '@/components/cta-link'
 import { nav } from '@/lib/content'
 import { cn } from '@/lib/utils'
@@ -34,8 +34,8 @@ export function SiteHeader() {
           : 'border-transparent bg-transparent',
       )}
     >
-      <div className="mx-auto flex h-18 max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
-        <FoxLogo priority />
+      <div className="mx-auto flex h-20 max-w-6xl items-center justify-between gap-4 px-5 py-4 sm:px-8">
+        <BrandLockupLink priority imageClassName="h-11 sm:h-12" />
 
         <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
           {nav.map((item) => {

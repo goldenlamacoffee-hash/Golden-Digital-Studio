@@ -1,27 +1,28 @@
-import Image from 'next/image'
 import { CtaLink } from '@/components/cta-link'
+import { FoxWatermark } from '@/components/fox-watermark'
 
 export function CtaSection() {
   return (
     <section className="border-t border-gold/10 bg-background">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
-        <div className="relative overflow-hidden rounded-3xl border border-gold/25 bg-espresso px-6 py-16 sm:px-12 sm:py-20">
+        <div className="relative overflow-hidden rounded-[2rem] border border-gold/25 bg-espresso px-6 py-16 shadow-[0_40px_120px_-50px_rgba(212,175,55,0.45)] sm:px-14 sm:py-24">
+          {/* Luxury fox watermark behind the message */}
+          <FoxWatermark
+            position="right-[-4%] top-1/2 -translate-y-1/2"
+            size="h-[520px] w-[520px]"
+            opacity="opacity-[0.08]"
+          />
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 flex items-center justify-end"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-espresso via-espresso/85 to-transparent"
             aria-hidden="true"
-          >
-            <Image
-              src="/brand/fox-emblem.png"
-              alt=""
-              width={690}
-              height={690}
-              className="h-full w-auto max-w-none object-contain opacity-30"
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-espresso via-espresso/85 to-espresso/40" />
-          </div>
+          />
 
           <div className="relative flex max-w-2xl flex-col gap-6">
-            <h2 className="font-heading text-4xl font-semibold leading-tight tracking-tight text-balance text-sand sm:text-5xl">
+            <span className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold">
+              <span className="h-px w-6 bg-gold/60" aria-hidden="true" />
+              Let&apos;s build
+            </span>
+            <h2 className="font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-balance text-sand sm:text-5xl lg:text-[3.5rem]">
               Build fast. Build clean.{' '}
               <span className="text-gold">Build golden.</span>
             </h2>
@@ -29,7 +30,7 @@ export function CtaSection() {
               Tell us where your business is today and where you want it to go.
               We&apos;ll map the highest-impact digital system to get you there.
             </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <div className="mt-2 flex flex-col gap-3 sm:flex-row">
               <CtaLink href="/contact" size="lg">
                 Book a consultation
               </CtaLink>

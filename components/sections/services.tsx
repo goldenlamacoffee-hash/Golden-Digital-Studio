@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { ArrowUpRight, Check } from 'lucide-react'
 import { SectionHeading } from '@/components/section-heading'
 import { services } from '@/lib/content'
 import { cn } from '@/lib/utils'
@@ -28,11 +28,18 @@ export function ServicesSection({ detailed, flush }: ServicesSectionProps) {
             <article
               key={service.slug}
               id={service.slug}
-              className="group flex scroll-mt-24 flex-col gap-4 rounded-2xl border border-gold/15 bg-card/60 p-7 transition-all hover:-translate-y-1 hover:border-gold/40 hover:bg-card"
+              className="group relative flex scroll-mt-24 flex-col gap-4 overflow-hidden rounded-[1.25rem] border border-gold/15 bg-card/60 p-7 transition-all duration-300 hover:-translate-y-1.5 hover:border-gold/45 hover:bg-card hover:shadow-[0_30px_80px_-55px_rgba(212,175,55,0.6)]"
             >
-              <span className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
-                {String(index + 1).padStart(2, '0')}
-              </span>
+              <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                aria-hidden="true"
+              />
+              <div className="flex items-center justify-between">
+                <span className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <ArrowUpRight className="size-4 text-gold opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              </div>
               <h3 className="font-heading text-xl font-semibold text-sand">
                 {service.title}
               </h3>

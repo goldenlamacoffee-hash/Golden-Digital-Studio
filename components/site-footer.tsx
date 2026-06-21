@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { FoxLogo } from '@/components/fox-logo'
+import { BrandLogo } from '@/components/brand-logo'
+import { FoxWatermark } from '@/components/fox-watermark'
 import { services, site } from '@/lib/content'
 
 const footerCols: { title: string; links: { label: string; href: string }[] }[] =
@@ -34,15 +35,34 @@ const footerCols: { title: string; links: { label: string; href: string }[] }[] 
 export function SiteFooter() {
   void services
   return (
-    <footer className="border-t border-gold/15 bg-espresso">
-      <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+    <footer className="relative overflow-hidden border-t border-gold/15 bg-espresso">
+      <FoxWatermark
+        position="right-[-8%] bottom-[-20%]"
+        size="h-[420px] w-[420px]"
+        opacity="opacity-[0.05]"
+        glow={false}
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/40 to-transparent"
+        aria-hidden="true"
+      />
+      <div className="relative mx-auto max-w-6xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div className="flex flex-col gap-5">
-            <FoxLogo size="md" subtitle={`by ${site.parent}`} className="w-fit" />
+            <Link
+              href="/"
+              aria-label="Golden Digital Studio — home"
+              className="w-fit transition-opacity hover:opacity-90"
+            >
+              <BrandLogo variant="horizontal" className="h-12 w-auto" />
+            </Link>
             <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
               Practical digital systems — websites, portals, apps and AI
               workflows — for ambitious small businesses across{' '}
               {site.regions.join(', ')}.
+            </p>
+            <p className="font-mono text-[0.7rem] uppercase tracking-[0.25em] text-gold/70">
+              A digital studio by {site.parent}
             </p>
           </div>
 
@@ -71,7 +91,7 @@ export function SiteFooter() {
           <p>
             &copy; {new Date().getFullYear()} {site.name}. All rights reserved.
           </p>
-          <p className="font-mono text-xs uppercase tracking-[0.2em]">
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold/70">
             {site.shortTagline}
           </p>
         </div>

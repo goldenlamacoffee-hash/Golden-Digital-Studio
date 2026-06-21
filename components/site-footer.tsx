@@ -38,17 +38,11 @@ export function SiteFooter() {
       <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.5fr_repeat(3,1fr)]">
           <div className="flex flex-col gap-5">
-            <FoxLogo
-              variant="mono-lockup"
-              className="w-fit rounded-md bg-sand px-4 py-3"
-            />
+            <FoxLogo size="md" subtitle={`by ${site.parent}`} className="w-fit" />
             <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
               Practical digital systems — websites, portals, apps and AI
               workflows — for ambitious small businesses across{' '}
               {site.regions.join(', ')}.
-            </p>
-            <p className="font-mono text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              by {site.parent}
             </p>
           </div>
 

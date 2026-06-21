@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { CtaLink } from '@/components/cta-link'
+import { FOX_MARK_SRC } from '@/components/fox-logo'
 import { site } from '@/lib/content'
 
 export function Hero() {
@@ -36,16 +37,26 @@ export function Hero() {
           </p>
         </div>
 
-        {/* Right: official primary logo (object-contain, never cropped or distorted) */}
-        <div className="flex items-center justify-center lg:justify-end">
-          <div className="w-full max-w-md rounded-3xl border border-gold/20 bg-sand p-8 shadow-2xl shadow-espresso/40 sm:p-10">
+        {/* Right: fox emblem as the brand signature — no white card, blends into the dark theme */}
+        <div className="relative flex items-center justify-center lg:justify-end">
+          <div className="relative flex aspect-square w-full max-w-md items-center justify-center">
+            {/* Soft gold glow */}
+            <div
+              className="pointer-events-none absolute inset-0 rounded-full bg-gold/20 blur-3xl"
+              aria-hidden="true"
+            />
+            {/* Subtle dark glass panel */}
+            <div
+              className="pointer-events-none absolute inset-4 rounded-[2rem] border border-gold/10 bg-espresso/40 backdrop-blur-sm"
+              aria-hidden="true"
+            />
             <Image
-              src="/brand/fox-primary.png"
-              alt="Golden Digital Studio"
-              width={676}
-              height={686}
+              src={FOX_MARK_SRC}
+              alt="Golden Digital Studio fox emblem"
+              width={690}
+              height={690}
               priority
-              className="h-auto w-full object-contain"
+              className="relative h-auto w-[78%] object-contain drop-shadow-[0_8px_40px_rgba(212,175,55,0.25)]"
             />
           </div>
         </div>

@@ -12,7 +12,7 @@ import {
   countNewInquiries,
   getLocaleContentCounts,
 } from '@/lib/admin/queries'
-import { getLocaleDebug } from '@/lib/i18n/server'
+import { getHostDebug } from '@/lib/i18n/server'
 import { locales, localeMeta } from '@/lib/i18n/config'
 
 export const dynamic = 'force-dynamic'
@@ -26,10 +26,10 @@ const cards = [
 ] as const
 
 export default async function AdminDashboard() {
-  const [counts, newInquiries, localeDebug, localeCounts] = await Promise.all([
+  const [counts, newInquiries, hostDebug, localeCounts] = await Promise.all([
     getCounts(),
     countNewInquiries(),
-    getLocaleDebug(),
+    getHostDebug(),
     Promise.all(
       locales.map(async (l) => ({ locale: l, counts: await getLocaleContentCounts(l) })),
     ),
@@ -91,13 +91,39 @@ export default async function AdminDashboard() {
           Admin-only diagnostics. Not shown on the public site.
         </p>
 
-        <dl className="mt-4 grid gap-3 sm:grid-cols-3">
+        <dl className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <div className="rounded-lg border border-border/60 p-3">
             <dt className="text-xs uppercase tracking-wide text-muted-foreground">
               Detected host
             </dt>
             <dd className="mt-1 font-mono text-sm text-foreground">
-              {localeDebug.host ?? 'unknown'}
+              {hostDebug.host ?? 'unknown'}
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Host type
+            </dt>
+            <dd className="mt-1 flex items-center gap-2">
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 font-mono text-xs ${
+                  hostDebug.kind === 'canonical'
+                    ? 'bg-gold/15 text-gold'
+                    : hostDebug.kind === 'alias'
+                      ? 'bg-amber-500/15 text-amber-500'
+                      : 'bg-muted text-muted-foreground'
+                }`}
+              >
+                {hostDebug.kind}
+              </span>
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Canonical domain
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground">
+              {hostDebug.canonicalHost ?? '—'}
             </dd>
           </div>
           <div className="rounded-lg border border-border/60 p-3">
@@ -105,15 +131,23 @@ export default async function AdminDashboard() {
               Resolved locale
             </dt>
             <dd className="mt-1 font-mono text-sm text-foreground">
-              {localeDebug.locale}
+              {hostDebug.locale}
             </dd>
           </div>
           <div className="rounded-lg border border-border/60 p-3">
             <dt className="text-xs uppercase tracking-wide text-muted-foreground">
-              Resolved via
+              Locale source
             </dt>
             <dd className="mt-1 font-mono text-sm text-foreground">
-              {localeDebug.source}
+              {hostDebug.localeSource}
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Redirect target
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground break-all">
+              {hostDebug.redirectTarget ?? 'none (canonical)'}
             </dd>
           </div>
         </dl>

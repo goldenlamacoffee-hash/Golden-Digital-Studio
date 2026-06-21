@@ -52,6 +52,20 @@ export const domainLocaleMap: Record<string, Locale> = (() => {
   return map
 })()
 
+/**
+ * Every owned hostname (bare + `www.`), flat list. Single source of truth for
+ * both locale resolution and auth trusted origins so the two never drift apart.
+ */
+export const ownedHosts: readonly string[] = Object.keys(domainLocaleMap)
+
+/**
+ * `https://` origins for every owned domain. Used to populate Better Auth's
+ * `trustedOrigins` so admin login works on ALL owned production domains.
+ */
+export const ownedOrigins: readonly string[] = ownedHosts.map(
+  (host) => `https://${host}`,
+)
+
 /** Normalize a raw Host header: drop the port, lowercase. */
 function normalizeHost(host: string | undefined | null): string | null {
   if (!host) return null

@@ -1,5 +1,6 @@
 'use server'
 
+import { del } from '@vercel/blob'
 import { revalidatePath } from 'next/cache'
 import { eq } from 'drizzle-orm'
 import { db } from '@/lib/db'
@@ -213,6 +214,19 @@ export async function deleteInquiry(id: number) {
 
 export async function deleteMedia(id: number) {
   await requireAdmin()
+  // Look up the row first so we can also remove the underlying blob.
+  const [row] = await db
+    .select({ url: media.url })
+    .from(media)
+    .where(eq(media.id, id))
+    .limit(1)
   await db.delete(media).where(eq(media.id, id))
+  if (row?.url) {
+    try {
+      await del(row.url)
+    } catch (err) {
+      console.log('[v0] media blob delete failed:', (err as Error).message)
+    }
+  }
   revalidatePath('/admin/media')
 }

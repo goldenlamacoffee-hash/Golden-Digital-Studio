@@ -1,0 +1,218 @@
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { eq } from 'drizzle-orm'
+import { db } from '@/lib/db'
+import {
+  services,
+  projects,
+  packages,
+  sections,
+  siteSettings,
+  inquiries,
+  media,
+} from '@/lib/db/schema'
+import { requireAdmin } from '@/lib/admin/guard'
+import { isLocale, defaultLocale, type Locale } from '@/lib/i18n/config'
+
+/* ------------------------------- helpers ------------------------------- */
+
+function str(v: FormDataEntryValue | null): string {
+  return typeof v === 'string' ? v.trim() : ''
+}
+function optStr(v: FormDataEntryValue | null): string | null {
+  const s = str(v)
+  return s.length ? s : null
+}
+function bool(v: FormDataEntryValue | null): boolean {
+  return v === 'on' || v === 'true' || v === '1'
+}
+function int(v: FormDataEntryValue | null): number {
+  const n = Number.parseInt(str(v), 10)
+  return Number.isFinite(n) ? n : 0
+}
+/** Parse a textarea of newline-separated values into a string[]. */
+function lines(v: FormDataEntryValue | null): string[] {
+  return str(v)
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+}
+function localeOf(v: FormDataEntryValue | null): Locale {
+  const s = str(v)
+  return isLocale(s) ? s : defaultLocale
+}
+
+function revalidateSite() {
+  revalidatePath('/', 'layout')
+}
+
+/* ------------------------------- services ------------------------------ */
+
+export async function saveService(formData: FormData) {
+  await requireAdmin()
+  const id = int(formData.get('id'))
+  const values = {
+    locale: localeOf(formData.get('locale')),
+    slug: str(formData.get('slug')),
+    title: str(formData.get('title')),
+    summary: optStr(formData.get('summary')),
+    description: optStr(formData.get('description')),
+    features: lines(formData.get('features')),
+    icon: optStr(formData.get('icon')),
+    sortOrder: int(formData.get('sortOrder')),
+    isPublished: bool(formData.get('isPublished')),
+    updatedAt: new Date(),
+  }
+  if (id) {
+    await db.update(services).set(values).where(eq(services.id, id))
+  } else {
+    await db.insert(services).values(values)
+  }
+  revalidateSite()
+}
+
+export async function deleteService(id: number) {
+  await requireAdmin()
+  await db.delete(services).where(eq(services.id, id))
+  revalidateSite()
+}
+
+/* ------------------------------- projects ------------------------------ */
+
+export async function saveProject(formData: FormData) {
+  await requireAdmin()
+  const id = int(formData.get('id'))
+  const values = {
+    locale: localeOf(formData.get('locale')),
+    slug: str(formData.get('slug')),
+    name: str(formData.get('name')),
+    category: optStr(formData.get('category')),
+    description: optStr(formData.get('description')),
+    imageUrl: optStr(formData.get('imageUrl')),
+    url: optStr(formData.get('url')),
+    sortOrder: int(formData.get('sortOrder')),
+    isPublished: bool(formData.get('isPublished')),
+    updatedAt: new Date(),
+  }
+  if (id) {
+    await db.update(projects).set(values).where(eq(projects.id, id))
+  } else {
+    await db.insert(projects).values(values)
+  }
+  revalidateSite()
+}
+
+export async function deleteProject(id: number) {
+  await requireAdmin()
+  await db.delete(projects).where(eq(projects.id, id))
+  revalidateSite()
+}
+
+/* ------------------------------- packages ------------------------------ */
+
+export async function savePackage(formData: FormData) {
+  await requireAdmin()
+  const id = int(formData.get('id'))
+  const values = {
+    locale: localeOf(formData.get('locale')),
+    slug: str(formData.get('slug')),
+    name: str(formData.get('name')),
+    price: optStr(formData.get('price')),
+    description: optStr(formData.get('description')),
+    features: lines(formData.get('features')),
+    isFeatured: bool(formData.get('isFeatured')),
+    ctaLabel: optStr(formData.get('ctaLabel')),
+    sortOrder: int(formData.get('sortOrder')),
+    isPublished: bool(formData.get('isPublished')),
+    updatedAt: new Date(),
+  }
+  if (id) {
+    await db.update(packages).set(values).where(eq(packages.id, id))
+  } else {
+    await db.insert(packages).values(values)
+  }
+  revalidateSite()
+}
+
+export async function deletePackage(id: number) {
+  await requireAdmin()
+  await db.delete(packages).where(eq(packages.id, id))
+  revalidateSite()
+}
+
+/* ------------------------------- sections ------------------------------ */
+
+export async function saveSection(formData: FormData) {
+  await requireAdmin()
+  const id = int(formData.get('id'))
+  const values = {
+    locale: localeOf(formData.get('locale')),
+    key: str(formData.get('key')),
+    eyebrow: optStr(formData.get('eyebrow')),
+    title: optStr(formData.get('title')),
+    subtitle: optStr(formData.get('subtitle')),
+    body: optStr(formData.get('body')),
+    sortOrder: int(formData.get('sortOrder')),
+    isPublished: bool(formData.get('isPublished')),
+    updatedAt: new Date(),
+  }
+  if (id) {
+    await db.update(sections).set(values).where(eq(sections.id, id))
+  } else {
+    await db.insert(sections).values(values)
+  }
+  revalidateSite()
+}
+
+export async function deleteSection(id: number) {
+  await requireAdmin()
+  await db.delete(sections).where(eq(sections.id, id))
+  revalidateSite()
+}
+
+/* ----------------------------- site settings --------------------------- */
+
+export async function saveSettings(formData: FormData) {
+  await requireAdmin()
+  const locale = localeOf(formData.get('locale'))
+  const values = {
+    locale,
+    brandName: str(formData.get('brandName')) || 'Golden Digital Studio',
+    tagline: optStr(formData.get('tagline')),
+    parent: optStr(formData.get('parent')),
+    email: optStr(formData.get('email')),
+    phone: optStr(formData.get('phone')),
+    regions: lines(formData.get('regions')),
+    seoTitle: optStr(formData.get('seoTitle')),
+    seoDescription: optStr(formData.get('seoDescription')),
+    updatedAt: new Date(),
+  }
+  await db
+    .insert(siteSettings)
+    .values(values)
+    .onConflictDoUpdate({ target: siteSettings.locale, set: values })
+  revalidateSite()
+}
+
+/* ------------------------------ inquiries ------------------------------ */
+
+export async function updateInquiryStatus(id: number, status: string) {
+  await requireAdmin()
+  await db.update(inquiries).set({ status }).where(eq(inquiries.id, id))
+  revalidatePath('/admin/inquiries')
+}
+
+export async function deleteInquiry(id: number) {
+  await requireAdmin()
+  await db.delete(inquiries).where(eq(inquiries.id, id))
+  revalidatePath('/admin/inquiries')
+}
+
+/* -------------------------------- media -------------------------------- */
+
+export async function deleteMedia(id: number) {
+  await requireAdmin()
+  await db.delete(media).where(eq(media.id, id))
+  revalidatePath('/admin/media')
+}

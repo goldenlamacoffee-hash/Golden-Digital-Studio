@@ -41,6 +41,12 @@ export function isLocale(value: string | undefined | null): value is Locale {
   return !!value && (locales as readonly string[]).includes(value)
 }
 
+/** Resolve a locale from an admin page's `?locale=` search param. */
+export function localeFromParam(value: string | string[] | undefined): Locale {
+  const v = Array.isArray(value) ? value[0] : value
+  return isLocale(v) ? v : defaultLocale
+}
+
 /** Resolve a locale from a hostname using the domain map (handles www. and ports). */
 export function localeFromHost(host: string | undefined | null): Locale | null {
   if (!host) return null

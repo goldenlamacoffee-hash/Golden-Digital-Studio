@@ -21,8 +21,8 @@ export function Hero() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 mx-auto grid max-w-6xl grid-cols-1 items-center gap-12 px-5 pt-20 pb-24 sm:px-8 sm:pt-28 sm:pb-32 lg:min-h-[90vh] lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-        {/* Left: copy */}
+      <div className="relative z-10 mx-auto flex max-w-4xl flex-col px-5 pt-24 pb-24 sm:px-8 sm:pt-32 sm:pb-32 lg:min-h-[85vh] lg:justify-center">
+        {/* Copy */}
         <div className="flex flex-col gap-8">
           <span className="inline-flex w-fit items-center gap-2.5 rounded-full border border-gold/30 bg-espresso/60 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-gold backdrop-blur">
             <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
@@ -52,22 +52,6 @@ export function Hero() {
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
               {site.tagline}
             </p>
-          </div>
-        </div>
-
-        {/* Right: primary logo as the hero brand element — soft halo, no hard card */}
-        <div className="relative flex items-center justify-center lg:justify-end">
-          <div className="relative flex w-full max-w-md items-center justify-center">
-            <div
-              className="pointer-events-none absolute inset-0 rounded-full bg-gold/15 blur-[90px]"
-              aria-hidden="true"
-            />
-            <BrandLogo
-              variant="primary"
-              priority
-              sizes="(min-width: 1024px) 420px, 80vw"
-              className="relative h-auto w-[82%] drop-shadow-[0_20px_70px_rgba(212,175,55,0.22)]"
-            />
           </div>
         </div>
       </div>

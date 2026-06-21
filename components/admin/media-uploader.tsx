@@ -86,7 +86,6 @@ export function MediaUploader() {
   }
 
   async function handleUpload() {
-    console.log('[v0] handleUpload invoked. file?', !!file, 'busy?', busy)
     if (!file || busy) return
     const validationError = validateImageFile(file)
     if (validationError) {
@@ -98,14 +97,12 @@ export function MediaUploader() {
     setIsUploading(true)
     try {
       const dimensions = await readDimensions(file)
-      console.log('[v0] starting blob upload', file.name, file.size, file.type)
 
       const blob = await upload(`media/${file.name}`, file, {
         access: 'public',
         handleUploadUrl: '/api/admin/media/upload',
         contentType: file.type,
       })
-      console.log('[v0] blob upload done', blob.url)
 
       setIsUploading(false)
 

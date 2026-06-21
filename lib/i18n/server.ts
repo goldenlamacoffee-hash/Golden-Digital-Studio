@@ -1,6 +1,7 @@
 import { cookies, headers } from 'next/headers'
 import {
   LOCALE_COOKIE,
+  originForHost,
   resolveHost,
   resolveLocale,
   type Locale,
@@ -44,11 +45,21 @@ export async function getLocaleDebug(): Promise<{
 /**
  * Full domain + locale diagnosis for the current request. Wraps `resolveHost`
  * with the live Host header. Powers the admin localization debug panel:
- * detected host, canonical domain, canonical/alias classification, resolved
- * locale + source, and the redirect target for aliases.
+ * detected host, whether it is owned, resolved locale + source, the SEO
+ * representative domain, and confirmation that app-level redirects are disabled.
  */
 export async function getHostDebug() {
   const headerList = await headers()
   const host = headerList.get('host')
-  return resolveHost(host, '/')
+  return resolveHost(host)
+}
+
+/**
+ * The origin for the current request's canonical / OG URL. Every owned domain
+ * self-canonicalizes to its own host; localhost / preview falls back to the
+ * locale's representative domain.
+ */
+export async function getRequestOrigin(): Promise<string> {
+  const headerList = await headers()
+  return originForHost(headerList.get('host'))
 }

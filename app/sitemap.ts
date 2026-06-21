@@ -1,13 +1,14 @@
 import type { MetadataRoute } from 'next'
-import { canonicalHostLocale, localeOrigin } from '@/lib/i18n/config'
+import { locales, localeOrigin } from '@/lib/i18n/config'
 
 /** Public, indexable paths shared across every market. */
 const paths = ['', '/services', '/portfolio', '/contact'] as const
 
 /**
- * Sitemap contains ONLY the three canonical market domains — never an alias or
- * `www.` host. Each entry advertises its localized alternates via hreflang so
- * search engines treat the three domains as one cross-linked, non-duplicate set.
+ * Sitemap lists the representative domain for each locale (Option A) — every
+ * owned domain still renders the site, but we advertise one clean URL set per
+ * language and cross-link them with hreflang so search engines treat them as a
+ * single, non-duplicate set.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
   const languages = {
@@ -18,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const entries: MetadataRoute.Sitemap = []
 
-  for (const locale of Object.values(canonicalHostLocale)) {
+  for (const locale of locales) {
     const origin = localeOrigin(locale)
     for (const path of paths) {
       entries.push({

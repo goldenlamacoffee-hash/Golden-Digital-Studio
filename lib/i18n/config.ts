@@ -7,47 +7,47 @@ export const defaultLocale: Locale = 'en'
 export const LOCALE_COOKIE = 'gds_locale'
 
 /**
- * The three official market domains. Each is the ONE canonical host for its
- * locale — every alias and `www.` variant redirects (308) here, and canonical
- * URLs / hreflang / sitemap only ever reference these hosts.
+ * EVERY domain we own renders the full Golden Digital Studio website — there
+ * are NO redirect-only aliases. Domains are grouped by the locale they serve.
+ * The host's TLD decides the language: `.cz` → Czech, `.sk` → Slovak,
+ * `.online` → English. `www.` variants are added automatically below.
  */
-export const canonicalHostLocale = {
-  'goldendigital.cz': 'cs-CZ',
-  'goldendigital.sk': 'sk-SK',
-  'goldendigital.online': 'en',
-} as const satisfies Record<string, Locale>
-
-export type CanonicalHost = keyof typeof canonicalHostLocale
-
-/**
- * Alias / defensive domains (bare form, `www.` stripped) → their canonical host.
- * These must never render as independent sites; they 308-redirect to canonical.
- * `www.` of a canonical host is handled implicitly (see `canonicalHostFor`).
- */
-export const aliasHostToCanonical: Record<string, CanonicalHost> = {
-  'goldendigitalstudio.cz': 'goldendigital.cz',
-  'goldendigitalstudio.sk': 'goldendigital.sk',
-  'goldenstudio.cz': 'goldendigital.cz',
-  'goldenstudio.sk': 'goldendigital.sk',
-  'goldenstudio.online': 'goldendigital.online',
-  'gdstudio.online': 'goldendigital.online',
+export const ownedDomainsByLocale: Record<Locale, readonly string[]> = {
+  'cs-CZ': ['goldendigital.cz', 'goldendigitalstudio.cz', 'goldenstudio.cz'],
+  'sk-SK': ['goldendigital.sk', 'goldendigitalstudio.sk', 'goldenstudio.sk'],
+  en: ['goldendigital.online', 'goldenstudio.online', 'gdstudio.online'],
 }
 
 /**
- * Maps every known production hostname (canonical + alias, with and without
- * `www.`) to its locale. Derived from the canonical + alias tables so there is
- * a single source of truth. Used for locale resolution on any owned domain.
+ * The single SEO-representative domain per locale. Used for hreflang, the
+ * sitemap and the default canonical when the request host is unknown
+ * (localhost / preview). It does NOT cause any redirect — the other owned
+ * domains still render and self-canonicalize.
+ */
+export const representativeDomain: Record<Locale, string> = {
+  en: 'goldendigital.online',
+  'cs-CZ': 'goldendigital.cz',
+  'sk-SK': 'goldendigital.sk',
+}
+
+/** `x-default` hreflang + global fallback target. */
+export const xDefaultOrigin = `https://${representativeDomain.en}`
+
+/**
+ * Maps every owned hostname (bare + `www.`) to its locale. Derived from
+ * `ownedDomainsByLocale` so there is a single source of truth. Used for
+ * host-based locale resolution on every owned domain.
  */
 export const domainLocaleMap: Record<string, Locale> = (() => {
   const map: Record<string, Locale> = {}
-  for (const [host, locale] of Object.entries(canonicalHostLocale)) {
-    map[host] = locale
-    map[`www.${host}`] = locale
-  }
-  for (const [alias, canonical] of Object.entries(aliasHostToCanonical)) {
-    const locale = canonicalHostLocale[canonical]
-    map[alias] = locale
-    map[`www.${alias}`] = locale
+  for (const [locale, hosts] of Object.entries(ownedDomainsByLocale) as [
+    Locale,
+    readonly string[],
+  ][]) {
+    for (const host of hosts) {
+      map[host] = locale
+      map[`www.${host}`] = locale
+    }
   }
   return map
 })()
@@ -58,44 +58,21 @@ function normalizeHost(host: string | undefined | null): string | null {
   return host.split(':')[0].toLowerCase()
 }
 
-/**
- * The canonical host for any owned domain (canonical or alias, www or not).
- * Returns null for unknown hosts (localhost / preview).
- */
-export function canonicalHostFor(
-  host: string | undefined | null,
-): CanonicalHost | null {
-  const raw = normalizeHost(host)
-  if (!raw) return null
-  const bare = raw.replace(/^www\./, '')
-  if (bare in canonicalHostLocale) return bare as CanonicalHost
-  if (bare in aliasHostToCanonical) return aliasHostToCanonical[bare]
-  return null
+/** True when the host is one of our owned production domains (bare or www). */
+export function isOwnedHost(host: string | undefined | null): boolean {
+  return localeFromHost(host) !== null
 }
 
 /**
- * True only when the host is EXACTLY a canonical market domain (bare, no www,
- * not an alias). Canonical hosts render directly; everything else redirects.
+ * The origin to use for THIS request's canonical/OG URL. Every owned domain
+ * self-canonicalizes to its own host (so the domain stays live and indexable);
+ * unknown hosts (localhost / preview) fall back to the locale's representative.
  */
-export function isCanonicalHost(host: string | undefined | null): boolean {
-  const raw = normalizeHost(host)
-  return !!raw && raw in canonicalHostLocale
-}
-
-/**
- * Resolve the 308 redirect target for an alias/www host, preserving path+query.
- * Returns null when the host is already canonical or is unknown (localhost).
- * Example: goldenstudio.cz/services?x=1 → https://goldendigital.cz/services?x=1
- */
-export function getRedirectTarget(
-  host: string | undefined | null,
-  pathname: string,
-  search: string,
-): string | null {
-  const canonical = canonicalHostFor(host)
-  if (!canonical) return null
-  if (isCanonicalHost(host)) return null
-  return `https://${canonical}${pathname}${search}`
+export function originForHost(host: string | undefined | null): string {
+  const normalized = normalizeHost(host)
+  if (normalized && isOwnedHost(normalized)) return `https://${normalized}`
+  const { locale } = resolveLocale(host, null)
+  return `https://${representativeDomain[locale]}`
 }
 
 export const localeMeta: Record<
@@ -173,40 +150,37 @@ export function resolveLocale(
   return { locale: defaultLocale, source: 'default' }
 }
 
-export type HostKind = 'canonical' | 'alias' | 'non-production'
-
 /**
  * Full domain diagnosis for a request host — powers the admin debug panel and
- * keeps middleware + SEO consistent. Combines locale resolution with the
- * canonical/alias classification and (for aliases) the redirect target.
+ * keeps SEO consistent. There are no app-level redirects: every owned host
+ * renders the site and self-canonicalizes, while hreflang/sitemap reference the
+ * locale's representative domain.
  */
-export function resolveHost(
-  host: string | undefined | null,
-  pathname = '/',
-  search = '',
-): {
+export function resolveHost(host: string | undefined | null): {
   host: string | null
-  kind: HostKind
-  canonicalHost: CanonicalHost | null
-  canonicalUrl: string | null
+  owned: boolean
   locale: Locale
   localeSource: LocaleSource
-  redirectTarget: string | null
+  representativeDomain: string
+  representativeUrl: string
+  canonicalUrl: string
+  appRedirectDisabled: true
 } {
   const normalized = normalizeHost(host)
-  const canonicalHost = canonicalHostFor(host)
+  const owned = isOwnedHost(host)
   const { locale, source } = resolveLocale(host, null)
-
-  let kind: HostKind = 'non-production'
-  if (canonicalHost) kind = isCanonicalHost(host) ? 'canonical' : 'alias'
+  const repDomain = representativeDomain[locale]
 
   return {
     host: normalized,
-    kind,
-    canonicalHost,
-    canonicalUrl: canonicalHost ? `https://${canonicalHost}` : null,
+    owned,
     locale,
     localeSource: source,
-    redirectTarget: getRedirectTarget(host, pathname, search),
+    representativeDomain: repDomain,
+    representativeUrl: `https://${repDomain}`,
+    canonicalUrl: originForHost(host),
+    // App-level redirects are intentionally disabled so every owned domain
+    // stays live. Apex↔www normalization (if any) is handled by Vercel DNS.
+    appRedirectDisabled: true,
   }
 }

@@ -2,6 +2,7 @@ import { AdminPageHeader } from '@/components/admin/admin-page-header'
 import { ResourceForm } from '@/components/admin/resource-form'
 import { DeleteButton } from '@/components/admin/delete-button'
 import { TextField, AreaField, ToggleField } from '@/components/admin/form-fields'
+import { ImageUrlField } from '@/components/admin/image-url-field'
 import { listProjects } from '@/lib/admin/queries'
 import { saveProject, deleteProject } from '@/app/actions/admin'
 import { localeFromParam, type Locale } from '@/lib/i18n/config'
@@ -20,7 +21,9 @@ function Fields({ row }: { row?: Row }) {
       <div className="sm:col-span-2">
         <AreaField name="description" label="Description" defaultValue={row?.description} rows={3} />
       </div>
-      <TextField name="imageUrl" label="Image URL" defaultValue={row?.imageUrl} hint="Paste a URL from the Media library" />
+      <div className="sm:col-span-2">
+        <ImageUrlField name="imageUrl" label="Image URL" defaultValue={row?.imageUrl} hint="Paste a URL from the Media library" />
+      </div>
       <TextField name="sortOrder" label="Sort order" defaultValue={String(row?.sortOrder ?? 0)} />
       <ToggleField name="isPublished" label="Published" defaultChecked={row?.isPublished ?? true} />
     </div>

@@ -12,11 +12,11 @@ export function WhyUs() {
           description="We combine speed, real business sense and a modern toolkit — backed by the standards of LMVK Group."
         />
 
-        <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-gold/15 bg-gold/10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {advantages.map((item) => (
             <div
               key={item.title}
-              className="group flex flex-col gap-3 bg-background p-7 transition-colors hover:bg-card"
+              className="group flex flex-col gap-3 rounded-2xl border border-gold/15 bg-background p-7 transition-all duration-300 hover:-translate-y-1 hover:border-gold/40 hover:bg-card hover:shadow-[0_24px_60px_-45px_rgba(212,175,55,0.6)]"
             >
               <div className="flex items-center justify-between">
                 <h3 className="font-heading text-lg font-semibold text-sand">

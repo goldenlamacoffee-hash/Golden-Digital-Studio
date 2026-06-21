@@ -1,6 +1,7 @@
 import { ArrowUpRight, Check } from 'lucide-react'
 import { SectionHeading } from '@/components/section-heading'
-import { services } from '@/lib/content'
+import { services as seedServices } from '@/lib/content'
+import type { ServiceItem } from '@/lib/cms/queries'
 import { cn } from '@/lib/utils'
 
 type ServicesSectionProps = {
@@ -8,9 +9,26 @@ type ServicesSectionProps = {
   detailed?: boolean
   /** Render without the top border (used when first on a page). */
   flush?: boolean
+  /** Locale-aware items from the CMS; falls back to seed content. */
+  items?: ServiceItem[]
+  heading?: { eyebrow?: string; title?: string; description?: string }
 }
 
-export function ServicesSection({ detailed, flush }: ServicesSectionProps) {
+export function ServicesSection({
+  detailed,
+  flush,
+  items,
+  heading,
+}: ServicesSectionProps) {
+  const data: ServiceItem[] =
+    items ??
+    seedServices.map((s) => ({
+      slug: s.slug,
+      title: s.title,
+      summary: s.summary,
+      features: s.details,
+    }))
+
   return (
     <section
       id="services"
@@ -18,13 +36,19 @@ export function ServicesSection({ detailed, flush }: ServicesSectionProps) {
     >
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <SectionHeading
-          eyebrow="Services"
-          title="Everything you need to run a modern digital business."
-          description="One studio for the systems that matter — built to work together and easy to maintain."
+          eyebrow={heading?.eyebrow ?? 'Services'}
+          title={
+            heading?.title ??
+            'Everything you need to run a modern digital business.'
+          }
+          description={
+            heading?.description ??
+            'One studio for the systems that matter — built to work together and easy to maintain.'
+          }
         />
 
         <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, index) => (
+          {data.map((service, index) => (
             <article
               key={service.slug}
               id={service.slug}
@@ -47,9 +71,9 @@ export function ServicesSection({ detailed, flush }: ServicesSectionProps) {
                 {service.summary}
               </p>
 
-              {detailed ? (
+              {detailed && service.features.length > 0 ? (
                 <ul className="mt-2 flex flex-col gap-2.5 border-t border-gold/10 pt-4">
-                  {service.details.map((detail) => (
+                  {service.features.map((detail) => (
                     <li
                       key={detail}
                       className="flex items-start gap-2.5 text-sm text-muted-foreground"

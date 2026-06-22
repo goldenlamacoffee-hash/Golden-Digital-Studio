@@ -1,48 +1,29 @@
 import Link from 'next/link'
 import { BrandLogo } from '@/components/brand-logo'
 import { FoxWatermark } from '@/components/fox-watermark'
-import { services, site } from '@/lib/content'
+import { site } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 import type { Dictionary } from '@/lib/i18n/dictionaries'
+import { getSectionContent, SECTION_KEYS } from '@/lib/cms/section-content'
 
-const footerCols: { title: string; links: { label: string; href: string }[] }[] =
-  [
-    {
-      title: 'Services',
-      links: [
-        { label: 'Websites & CMS', href: '/services#websites-cms' },
-        { label: 'B2B portals', href: '/services#b2b-portals' },
-        { label: 'Mobile apps', href: '/services#mobile-apps' },
-        { label: 'AI workflows', href: '/services#ai-workflows' },
-      ],
-    },
-    {
-      title: 'Studio',
-      links: [
-        { label: 'Portfolio', href: '/portfolio' },
-        { label: 'Contact', href: '/contact' },
-        { label: 'Start a project', href: '/contact' },
-      ],
-    },
-    {
-      title: 'Legal',
-      links: [
-        { label: 'Privacy policy', href: '/contact' },
-        { label: 'Terms of service', href: '/contact' },
-        { label: 'Imprint', href: '/contact' },
-      ],
-    },
-  ]
+type FooterColumn = { title: string; links: { label: string; href: string }[] }
 
-export function SiteFooter({
+export async function SiteFooter({
   locale,
   dict,
 }: {
   locale: Locale
   dict: Dictionary
 }) {
-  void services
-  void locale
+  const section = await getSectionContent(locale, SECTION_KEYS.footer)
+  const data = section.data as {
+    columns?: FooterColumn[]
+    parentLine?: string
+    slogan?: string
+  }
+  const columns = Array.isArray(data.columns) ? data.columns : []
+  const blurb = section.body ?? ''
+
   return (
     <footer className="relative overflow-hidden border-t border-gold/15 bg-espresso">
       <FoxWatermark
@@ -66,23 +47,23 @@ export function SiteFooter({
               <BrandLogo variant="horizontal" className="h-12 w-auto" />
             </Link>
             <p className="max-w-xs text-pretty text-sm leading-relaxed text-muted-foreground">
-              Practical digital systems — websites, portals, apps and AI
-              workflows — for ambitious small businesses across{' '}
-              {site.regions.join(', ')}.
+              {blurb}
             </p>
-            <p className="font-mono text-[0.7rem] uppercase tracking-[0.25em] text-gold/70">
-              A digital studio by {site.parent}
-            </p>
+            {data.parentLine ? (
+              <p className="font-mono text-[0.7rem] uppercase tracking-[0.25em] text-gold/70">
+                {data.parentLine}
+              </p>
+            ) : null}
           </div>
 
-          {footerCols.map((col) => (
+          {columns.map((col) => (
             <div key={col.title} className="flex flex-col gap-4">
               <h3 className="font-mono text-xs uppercase tracking-[0.25em] text-gold">
                 {col.title}
               </h3>
               <ul className="flex flex-col gap-3">
                 {col.links.map((link) => (
-                  <li key={link.label}>
+                  <li key={`${link.label}-${link.href}`}>
                     <Link
                       href={link.href}
                       className="text-sm text-muted-foreground transition-colors hover:text-sand"
@@ -101,7 +82,7 @@ export function SiteFooter({
             &copy; {new Date().getFullYear()} {site.name}. {dict.footer.rights}
           </p>
           <p className="font-mono text-xs uppercase tracking-[0.2em] text-gold/70">
-            {site.shortTagline}
+            {data.slogan ?? site.shortTagline}
           </p>
         </div>
       </div>

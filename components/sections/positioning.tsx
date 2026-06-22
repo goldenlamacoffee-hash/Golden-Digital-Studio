@@ -1,19 +1,27 @@
 import { SectionHeading } from '@/components/section-heading'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import {
+  getSectionContent,
+  sectionItems,
+  SECTION_KEYS,
+} from '@/lib/cms/section-content'
 
-const stats: { value: string; label: string }[] = [
-  { value: 'CMS-first', label: 'You own and edit your content' },
-  { value: 'Weeks', label: 'Typical time to a first launch' },
-  { value: 'AI-assisted', label: 'Faster builds without cut corners' },
-]
+export async function Positioning({
+  locale = defaultLocale,
+}: {
+  locale?: Locale
+}) {
+  const section = await getSectionContent(locale, SECTION_KEYS.homePositioning)
+  const stats = sectionItems(section) as { value: string; label: string }[]
 
-export function Positioning() {
   return (
     <section className="border-t border-gold/10 bg-card/40">
       <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">
         <SectionHeading
-          eyebrow="Positioning"
-          title="From outdated websites and manual work to modern digital systems."
-          description="Most small businesses are held back by a slow website and a stack of manual tasks. Golden Digital Studio replaces that with clean, connected systems — built around how your business actually works, not around hype. The result is software that is faster to use, easier to maintain and ready to grow with you."
+          eyebrow={section.eyebrow ?? undefined}
+          title={section.title ?? ''}
+          description={section.body ?? undefined}
         />
 
         <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">

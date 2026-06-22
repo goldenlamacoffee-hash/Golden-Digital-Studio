@@ -1,26 +1,42 @@
 import { SectionHeading } from '@/components/section-heading'
 import { CtaLink } from '@/components/cta-link'
-import { aiTopics } from '@/lib/content'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import {
+  getSectionContent,
+  sectionItems,
+  SECTION_KEYS,
+} from '@/lib/cms/section-content'
 
-export function AiTraining() {
+export async function AiTraining({
+  locale = defaultLocale,
+}: {
+  locale?: Locale
+}) {
+  const section = await getSectionContent(locale, SECTION_KEYS.homeAiTraining)
+  const topics = sectionItems(section) as { title: string; body: string }[]
+  const ctaLabel = (section.data as { ctaLabel?: string }).ctaLabel
+
   return (
     <section className="border-t border-gold/10 bg-card/40">
       <div className="mx-auto grid max-w-6xl gap-12 px-5 py-20 sm:px-8 sm:py-28 lg:grid-cols-2 lg:items-center">
         <div className="flex flex-col gap-6">
           <SectionHeading
-            eyebrow="AI training"
-            title="We can also train your team to work with AI."
-            description="Beyond building systems, Golden Digital Studio runs practical, hands-on training so your team can use modern AI tools with confidence — from everyday assistants to repeatable content and automation workflows."
+            eyebrow={section.eyebrow ?? undefined}
+            title={section.title ?? ''}
+            description={section.body ?? undefined}
           />
-          <div className="w-fit">
-            <CtaLink href="/contact" variant="outline">
-              Ask about training
-            </CtaLink>
-          </div>
+          {ctaLabel ? (
+            <div className="w-fit">
+              <CtaLink href="/contact" variant="outline">
+                {ctaLabel}
+              </CtaLink>
+            </div>
+          ) : null}
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {aiTopics.map((topic) => (
+          {topics.map((topic) => (
             <div
               key={topic.title}
               className="rounded-2xl border border-gold/15 bg-espresso/50 p-6"

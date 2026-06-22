@@ -8,6 +8,7 @@ import { CtaSection } from '@/components/sections/cta-section'
 import { FoxWatermark } from '@/components/fox-watermark'
 import { getLocale } from '@/lib/i18n/server'
 import { getProject } from '@/lib/cms/queries'
+import { getSectionContent, SECTION_KEYS } from '@/lib/cms/section-content'
 import { getProjectImage, isValidExternalUrl, sizeSpanClass } from '@/lib/portfolio'
 
 type Params = { slug: string }
@@ -42,6 +43,12 @@ export default async function ProjectDetailPage({
   const project = await getProject(locale, slug)
   if (!project) notFound()
 
+  const labelSection = await getSectionContent(locale, SECTION_KEYS.portfolioLabels)
+  const labels = labelSection.data as {
+    allWork?: string
+    visitLiveSite?: string
+  }
+
   const cover = getProjectImage(project)
   const showLink = isValidExternalUrl(project.url)
 
@@ -74,7 +81,7 @@ export default async function ProjectDetailPage({
             className="inline-flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] text-sand/60 transition-colors hover:text-gold"
           >
             <ArrowLeft className="size-3.5" aria-hidden="true" />
-            All work
+            {labels.allWork ?? 'All work'}
           </Link>
 
           {project.category ? (
@@ -101,7 +108,7 @@ export default async function ProjectDetailPage({
               rel="noopener noreferrer"
               className="inline-flex w-fit items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-5 py-2.5 font-mono text-xs uppercase tracking-[0.2em] text-gold transition-colors hover:bg-gold/20"
             >
-              Visit live site
+              {labels.visitLiveSite ?? 'Visit live site'}
               <ArrowUpRight className="size-4" aria-hidden="true" />
             </a>
           ) : null}

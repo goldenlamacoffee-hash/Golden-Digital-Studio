@@ -1,15 +1,24 @@
 import { ArrowUpRight } from 'lucide-react'
 import { SectionHeading } from '@/components/section-heading'
-import { advantages } from '@/lib/content'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import {
+  getSectionContent,
+  sectionItems,
+  SECTION_KEYS,
+} from '@/lib/cms/section-content'
 
-export function WhyUs() {
+export async function WhyUs({ locale = defaultLocale }: { locale?: Locale }) {
+  const section = await getSectionContent(locale, SECTION_KEYS.homeWhyUs)
+  const advantages = sectionItems(section) as { title: string; body: string }[]
+
   return (
     <section className="border-t border-gold/10 bg-card/40">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <SectionHeading
-          eyebrow="Why us"
-          title="A studio built for outcomes, not just deliverables."
-          description="We combine speed, real business sense and a modern toolkit — backed by the standards of LMVK Group."
+          eyebrow={section.eyebrow ?? undefined}
+          title={section.title ?? ''}
+          description={section.body ?? undefined}
         />
 
         <div className="mt-12 grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">

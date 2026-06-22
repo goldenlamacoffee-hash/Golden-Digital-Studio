@@ -1,7 +1,21 @@
 import { CtaLink } from '@/components/cta-link'
 import { FoxWatermark } from '@/components/fox-watermark'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import { getSectionContent, SECTION_KEYS } from '@/lib/cms/section-content'
 
-export function CtaSection() {
+export async function CtaSection({
+  locale = defaultLocale,
+}: {
+  locale?: Locale
+}) {
+  const section = await getSectionContent(locale, SECTION_KEYS.homeFinalCta)
+  const data = section.data as {
+    titleHighlight?: string
+    primaryCta?: string
+    secondaryCta?: string
+  }
+
   return (
     <section className="border-t border-gold/10 bg-background">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
@@ -20,22 +34,21 @@ export function CtaSection() {
           <div className="relative flex max-w-2xl flex-col gap-6">
             <span className="inline-flex w-fit items-center gap-2 font-mono text-xs uppercase tracking-[0.3em] text-gold">
               <span className="h-px w-6 bg-gold/60" aria-hidden="true" />
-              Let&apos;s build
+              {section.eyebrow}
             </span>
             <h2 className="font-heading text-4xl font-semibold leading-[1.05] tracking-tight text-balance text-sand sm:text-5xl lg:text-[3.5rem]">
-              Build fast. Build clean.{' '}
-              <span className="text-gold">Build golden.</span>
+              {section.title}{' '}
+              <span className="text-gold">{data.titleHighlight}</span>
             </h2>
             <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-              Tell us where your business is today and where you want it to go.
-              We&apos;ll map the highest-impact digital system to get you there.
+              {section.body}
             </p>
             <div className="mt-2 flex flex-col gap-3 sm:flex-row">
               <CtaLink href="/contact" size="lg">
-                Book a consultation
+                {data.primaryCta}
               </CtaLink>
               <CtaLink href="/portfolio" size="lg" variant="outline">
-                View our work
+                {data.secondaryCta}
               </CtaLink>
             </div>
           </div>

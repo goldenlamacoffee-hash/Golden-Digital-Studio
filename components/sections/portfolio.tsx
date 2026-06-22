@@ -11,19 +11,33 @@ import {
   getPortfolioExcerpt,
   resolveProjectContent,
 } from '@/lib/portfolio'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import { getSectionContent, SECTION_KEYS } from '@/lib/cms/section-content'
 import { cn } from '@/lib/utils'
 
 type PortfolioSectionProps = {
   flush?: boolean
   items?: ProjectItem[]
   heading?: { eyebrow?: string; title?: string; description?: string }
+  locale?: Locale
 }
 
-export function PortfolioSection({
+export async function PortfolioSection({
   flush,
   items,
   heading,
+  locale = defaultLocale,
 }: PortfolioSectionProps) {
+  const labelSection = await getSectionContent(
+    locale,
+    SECTION_KEYS.portfolioLabels,
+  )
+  const labels = labelSection.data as {
+    signatureWork?: string
+    viewCaseStudy?: string
+    visitSite?: string
+  }
   const projects: ProjectItem[] =
     items ??
     seedProjects.map((p) => {
@@ -107,7 +121,9 @@ export function PortfolioSection({
                   />
                   <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/70 via-background/10 to-transparent" />
                   <span className="absolute left-4 top-4 inline-flex items-center rounded-full border border-gold/25 bg-espresso/70 px-3 py-1 font-mono text-[11px] uppercase tracking-[0.2em] text-gold backdrop-blur-sm">
-                    {featured ? 'Signature work' : project.category}
+                    {featured
+                      ? labels.signatureWork ?? 'Signature work'
+                      : project.category}
                   </span>
                   <span className="absolute right-4 top-4 font-mono text-xs text-sand/70">
                     {String(index + 1).padStart(2, '0')}
@@ -139,7 +155,7 @@ export function PortfolioSection({
                   </p>
                   <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-4">
                     <span className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] text-gold transition-colors group-hover:text-warm-gold">
-                      View case study →
+                      {labels.viewCaseStudy ?? 'View case study →'}
                     </span>
                     {showLink ? (
                       <a
@@ -148,7 +164,7 @@ export function PortfolioSection({
                         rel="noopener noreferrer"
                         className="relative z-20 inline-flex w-fit items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] text-sand/60 transition-colors hover:text-gold"
                       >
-                        Visit site ↗
+                        {labels.visitSite ?? 'Visit site ↗'}
                       </a>
                     ) : null}
                   </div>

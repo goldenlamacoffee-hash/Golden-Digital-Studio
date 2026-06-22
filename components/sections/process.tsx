@@ -1,18 +1,31 @@
 import { SectionHeading } from '@/components/section-heading'
-import { processSteps } from '@/lib/content'
+import type { Locale } from '@/lib/i18n/config'
+import { defaultLocale } from '@/lib/i18n/config'
+import {
+  getSectionContent,
+  sectionItems,
+  SECTION_KEYS,
+} from '@/lib/cms/section-content'
 
-export function Process() {
+export async function Process({ locale = defaultLocale }: { locale?: Locale }) {
+  const section = await getSectionContent(locale, SECTION_KEYS.homeProcess)
+  const steps = sectionItems(section) as {
+    step: string
+    title: string
+    body: string
+  }[]
+
   return (
     <section className="border-t border-gold/10 bg-card/40">
       <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
         <SectionHeading
-          eyebrow="Process"
-          title="A clear path from idea to a system you can run."
-          description="Five focused stages keep the work transparent, fast and easy to follow."
+          eyebrow={section.eyebrow ?? undefined}
+          title={section.title ?? ''}
+          description={section.body ?? undefined}
         />
 
         <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-          {processSteps.map((step) => (
+          {steps.map((step) => (
             <li
               key={step.step}
               className="relative flex flex-col gap-3 rounded-2xl border border-gold/15 bg-background p-6"

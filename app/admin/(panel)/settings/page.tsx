@@ -1,7 +1,7 @@
 import { AdminPageHeader } from '@/components/admin/admin-page-header'
 import { SettingsForm } from '@/components/admin/settings-form'
 import { getSettings } from '@/lib/admin/queries'
-import { localeFromParam, type Locale } from '@/lib/i18n/config'
+import { getAdminLocale } from '@/lib/admin/locale'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,7 +11,7 @@ export default async function AdminSettingsPage({
   searchParams: Promise<{ locale?: string }>
 }) {
   const { locale: localeParam } = await searchParams
-  const locale: Locale = localeFromParam(localeParam)
+  const { locale } = await getAdminLocale(localeParam)
   const settings = await getSettings(locale)
 
   return (

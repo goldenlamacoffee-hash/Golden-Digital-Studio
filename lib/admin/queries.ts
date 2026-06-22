@@ -9,7 +9,36 @@ import {
   inquiries,
   media,
 } from '@/lib/db/schema'
-import type { Locale } from '@/lib/i18n/config'
+import { locales, type Locale } from '@/lib/i18n/config'
+
+type CountableEntity = 'services' | 'projects' | 'packages' | 'sections'
+
+/**
+ * Row counts per locale for a single content type, e.g.
+ * `{ en: 6, 'cs-CZ': 0, 'sk-SK': 0 }`. Powers the "Copy from <locale>"
+ * empty-state so it only offers markets that actually have content.
+ */
+export async function getEntityCountsByLocale(
+  entity: CountableEntity,
+): Promise<Record<Locale, number>> {
+  const table =
+    entity === 'services'
+      ? services
+      : entity === 'projects'
+        ? projects
+        : entity === 'packages'
+          ? packages
+          : sections
+  const rows = await db
+    .select({ locale: table.locale, c: sql<number>`count(*)::int` })
+    .from(table)
+    .groupBy(table.locale)
+  const result = Object.fromEntries(locales.map((l) => [l, 0])) as Record<Locale, number>
+  for (const r of rows) {
+    if (r.locale in result) result[r.locale as Locale] = r.c
+  }
+  return result
+}
 
 export async function listServices(locale: Locale) {
   return db

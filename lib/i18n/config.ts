@@ -91,23 +91,33 @@ export function originForHost(host: string | undefined | null): string {
 
 export const localeMeta: Record<
   Locale,
-  { label: string; shortLabel: string; htmlLang: string; domain: string }
+  {
+    label: string
+    shortLabel: string
+    /** Market name shown in the admin (e.g. "Online", "CZ", "SK"). */
+    market: string
+    htmlLang: string
+    domain: string
+  }
 > = {
   en: {
     label: 'English',
     shortLabel: 'EN',
+    market: 'Online',
     htmlLang: 'en',
     domain: 'goldenstudio.online',
   },
   'cs-CZ': {
     label: 'Čeština',
     shortLabel: 'CZ',
+    market: 'CZ',
     htmlLang: 'cs',
     domain: 'goldendigital.cz',
   },
   'sk-SK': {
     label: 'Slovenčina',
     shortLabel: 'SK',
+    market: 'SK',
     htmlLang: 'sk',
     domain: 'goldendigital.sk',
   },

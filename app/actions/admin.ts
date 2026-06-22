@@ -15,6 +15,7 @@ import {
 } from '@/lib/db/schema'
 import { requireAdmin } from '@/lib/admin/guard'
 import { isLocale, defaultLocale, type Locale } from '@/lib/i18n/config'
+import { assertValidLocale } from '@/lib/admin/locale'
 import { parseGallery } from '@/lib/portfolio'
 
 /* ------------------------------- helpers ------------------------------- */
@@ -175,6 +176,92 @@ export async function deleteSection(id: number) {
   await requireAdmin()
   await db.delete(sections).where(eq(sections.id, id))
   revalidateSite()
+}
+
+/* --------------------------- locale cloning ---------------------------- */
+
+export type CopyableEntity = 'services' | 'projects' | 'packages' | 'sections'
+
+/**
+ * Copy all rows of one content type from a source locale into a target locale.
+ * Existing target rows are NEVER overwritten — rows whose unique key (slug, or
+ * `key` for sections) already exists in the target are skipped. This powers the
+ * "Copy from <locale>" empty-state action and keeps each market's data isolated.
+ * Returns the number of rows inserted.
+ */
+export async function copyLocaleContent(
+  entity: CopyableEntity,
+  from: string,
+  to: string,
+): Promise<number> {
+  await requireAdmin()
+  const fromLocale = assertValidLocale(from)
+  const toLocale = assertValidLocale(to)
+  if (fromLocale === toLocale) return 0
+
+  const now = () => new Date()
+  let inserted = 0
+
+  if (entity === 'sections') {
+    const source = await db.select().from(sections).where(eq(sections.locale, fromLocale))
+    const existing = await db
+      .select({ key: sections.key })
+      .from(sections)
+      .where(eq(sections.locale, toLocale))
+    const taken = new Set(existing.map((r) => r.key))
+    const rows = source
+      .filter((r) => !taken.has(r.key))
+      .map(({ id, updatedAt, ...rest }) => ({ ...rest, locale: toLocale, updatedAt: now() }))
+    if (rows.length) {
+      await db.insert(sections).values(rows)
+      inserted = rows.length
+    }
+  } else if (entity === 'services') {
+    const source = await db.select().from(services).where(eq(services.locale, fromLocale))
+    const existing = await db
+      .select({ slug: services.slug })
+      .from(services)
+      .where(eq(services.locale, toLocale))
+    const taken = new Set(existing.map((r) => r.slug))
+    const rows = source
+      .filter((r) => !taken.has(r.slug))
+      .map(({ id, updatedAt, ...rest }) => ({ ...rest, locale: toLocale, updatedAt: now() }))
+    if (rows.length) {
+      await db.insert(services).values(rows)
+      inserted = rows.length
+    }
+  } else if (entity === 'projects') {
+    const source = await db.select().from(projects).where(eq(projects.locale, fromLocale))
+    const existing = await db
+      .select({ slug: projects.slug })
+      .from(projects)
+      .where(eq(projects.locale, toLocale))
+    const taken = new Set(existing.map((r) => r.slug))
+    const rows = source
+      .filter((r) => !taken.has(r.slug))
+      .map(({ id, updatedAt, ...rest }) => ({ ...rest, locale: toLocale, updatedAt: now() }))
+    if (rows.length) {
+      await db.insert(projects).values(rows)
+      inserted = rows.length
+    }
+  } else {
+    const source = await db.select().from(packages).where(eq(packages.locale, fromLocale))
+    const existing = await db
+      .select({ slug: packages.slug })
+      .from(packages)
+      .where(eq(packages.locale, toLocale))
+    const taken = new Set(existing.map((r) => r.slug))
+    const rows = source
+      .filter((r) => !taken.has(r.slug))
+      .map(({ id, updatedAt, ...rest }) => ({ ...rest, locale: toLocale, updatedAt: now() }))
+    if (rows.length) {
+      await db.insert(packages).values(rows)
+      inserted = rows.length
+    }
+  }
+
+  revalidateSite()
+  return inserted
 }
 
 /* ----------------------------- site settings --------------------------- */

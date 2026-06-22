@@ -4,8 +4,12 @@ import { PortfolioSection } from '@/components/sections/portfolio'
 import { WhyUs } from '@/components/sections/why-us'
 import { CtaSection } from '@/components/sections/cta-section'
 import { getLocale } from '@/lib/i18n/server'
-import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getProjects } from '@/lib/cms/queries'
+import {
+  getSectionContent,
+  getSectionHeading,
+  SECTION_KEYS,
+} from '@/lib/cms/section-content'
 
 export const metadata: Metadata = {
   title: 'Portfolio',
@@ -20,19 +24,22 @@ export const metadata: Metadata = {
 
 export default async function PortfolioPage() {
   const locale = await getLocale()
-  const t = getDictionary(locale)
-  const projects = await getProjects(locale)
+  const [projects, hero, portfolioHeading] = await Promise.all([
+    getProjects(locale),
+    getSectionContent(locale, SECTION_KEYS.portfolioHero),
+    getSectionHeading(locale, SECTION_KEYS.homePortfolio),
+  ])
 
   return (
     <>
       <PageHero
-        eyebrow="Portfolio"
-        title="Work that turns into momentum."
-        description="A selection of systems and brands we've shaped. Each one is built to perform today and ready to grow into its next phase."
+        eyebrow={hero.eyebrow ?? ''}
+        title={hero.title ?? ''}
+        description={hero.body ?? ''}
       />
-      <PortfolioSection flush items={projects} heading={t.sections.portfolio} />
-      <WhyUs />
-      <CtaSection />
+      <PortfolioSection flush items={projects} heading={portfolioHeading} locale={locale} />
+      <WhyUs locale={locale} />
+      <CtaSection locale={locale} />
     </>
   )
 }

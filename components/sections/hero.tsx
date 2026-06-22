@@ -3,10 +3,17 @@ import { BrandLogo } from '@/components/brand-logo'
 import { site } from '@/lib/content'
 import type { Locale } from '@/lib/i18n/config'
 import { defaultLocale } from '@/lib/i18n/config'
-import { getDictionary } from '@/lib/i18n/dictionaries'
+import { getSectionContent, SECTION_KEYS } from '@/lib/cms/section-content'
 
-export function Hero({ locale = defaultLocale }: { locale?: Locale }) {
-  const t = getDictionary(locale)
+export async function Hero({ locale = defaultLocale }: { locale?: Locale }) {
+  const section = await getSectionContent(locale, SECTION_KEYS.homeHero)
+  const data = section.data as {
+    titleHighlight?: string
+    tagline?: string
+    primaryCta?: string
+    secondaryCta?: string
+  }
+
   return (
     <section className="relative overflow-hidden">
       {/* Ghosted luxury fox watermark — pushed far right/lower, mostly off-canvas,
@@ -30,31 +37,31 @@ export function Hero({ locale = defaultLocale }: { locale?: Locale }) {
         <div className="flex flex-col gap-8">
           <span className="inline-flex w-fit items-center gap-2.5 rounded-full border border-gold/30 bg-espresso/60 px-4 py-1.5 font-mono text-xs uppercase tracking-[0.25em] text-gold backdrop-blur">
             <span className="size-1.5 rounded-full bg-gold" aria-hidden="true" />
-            {t.hero.badge} {site.parent}
+            {section.eyebrow} {site.parent}
           </span>
 
           <h1 className="max-w-3xl font-heading text-4xl font-semibold leading-[1.04] tracking-tight text-balance text-sand sm:text-5xl lg:text-[4rem]">
-            {t.hero.titleLead}{' '}
-            <span className="text-gold">{t.hero.titleHighlight}</span>
+            {section.title}{' '}
+            <span className="text-gold">{data.titleHighlight}</span>
           </h1>
 
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            {t.hero.description}
+            {section.body}
           </p>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             <CtaLink href="/contact" size="lg">
-              {t.cta.primary}
+              {data.primaryCta}
             </CtaLink>
             <CtaLink href="/services" size="lg" variant="outline">
-              {t.cta.secondary}
+              {data.secondaryCta}
             </CtaLink>
           </div>
 
           <div className="mt-2 flex items-center gap-4">
             <span className="h-px w-10 bg-gold/40" aria-hidden="true" />
             <p className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground">
-              {t.hero.tagline}
+              {data.tagline}
             </p>
           </div>
         </div>

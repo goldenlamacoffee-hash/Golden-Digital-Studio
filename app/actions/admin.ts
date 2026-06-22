@@ -160,6 +160,7 @@ export async function saveSection(formData: FormData) {
     title: optStr(formData.get('title')),
     subtitle: optStr(formData.get('subtitle')),
     body: optStr(formData.get('body')),
+    data: parseSectionData(formData.get('data')),
     sortOrder: int(formData.get('sortOrder')),
     isPublished: bool(formData.get('isPublished')),
     updatedAt: new Date(),
@@ -170,6 +171,22 @@ export async function saveSection(formData: FormData) {
     await db.insert(sections).values(values)
   }
   revalidateSite()
+}
+
+/**
+ * Parse the structured `data` JSON field from the section editor. Returns the
+ * parsed object on success, `null` when empty, and throws a clear error on
+ * invalid JSON so the operator sees what went wrong instead of silently losing
+ * structured content (cards, steps, footer columns, etc.).
+ */
+function parseSectionData(raw: FormDataEntryValue | null): unknown {
+  const text = typeof raw === 'string' ? raw.trim() : ''
+  if (!text) return null
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new Error('Section "data" must be valid JSON.')
+  }
 }
 
 export async function deleteSection(id: number) {

@@ -6,8 +6,12 @@ import { Packages } from '@/components/sections/packages'
 import { AiTraining } from '@/components/sections/ai-training'
 import { CtaSection } from '@/components/sections/cta-section'
 import { getLocale } from '@/lib/i18n/server'
-import { getDictionary } from '@/lib/i18n/dictionaries'
 import { getServices, getPackages } from '@/lib/cms/queries'
+import {
+  getSectionContent,
+  getSectionHeading,
+  SECTION_KEYS,
+} from '@/lib/cms/section-content'
 
 export const metadata: Metadata = {
   title: 'Services',
@@ -22,29 +26,27 @@ export const metadata: Metadata = {
 
 export default async function ServicesPage() {
   const locale = await getLocale()
-  const t = getDictionary(locale)
-  const [services, packages] = await Promise.all([
-    getServices(locale),
-    getPackages(locale),
-  ])
+  const [services, packages, hero, servicesHeading, packagesHeading] =
+    await Promise.all([
+      getServices(locale),
+      getPackages(locale),
+      getSectionContent(locale, SECTION_KEYS.servicesHero),
+      getSectionHeading(locale, SECTION_KEYS.homeServices),
+      getSectionHeading(locale, SECTION_KEYS.homePackages),
+    ])
 
   return (
     <>
       <PageHero
-        eyebrow="Services"
-        title="Digital systems, built to work together."
-        description="From your first modern website to portals, apps and AI workflows — Golden Digital Studio delivers the systems ambitious small businesses need, with a CMS-first, AI-assisted approach."
+        eyebrow={hero.eyebrow ?? ''}
+        title={hero.title ?? ''}
+        description={hero.body ?? ''}
       />
-      <ServicesSection
-        detailed
-        flush
-        items={services}
-        heading={t.sections.services}
-      />
-      <Process />
-      <Packages items={packages} heading={t.sections.packages} />
-      <AiTraining />
-      <CtaSection />
+      <ServicesSection detailed flush items={services} heading={servicesHeading} />
+      <Process locale={locale} />
+      <Packages items={packages} heading={packagesHeading} />
+      <AiTraining locale={locale} />
+      <CtaSection locale={locale} />
     </>
   )
 }

@@ -5,6 +5,7 @@ import { ContactForm } from '@/components/contact-form'
 import { faqs, site } from '@/lib/content'
 import { getLocale } from '@/lib/i18n/server'
 import { getDictionary } from '@/lib/i18n/dictionaries'
+import { getSectionContent, SECTION_KEYS } from '@/lib/cms/section-content'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -41,12 +42,13 @@ const details = [
 export default async function ContactPage() {
   const locale = await getLocale()
   const t = getDictionary(locale)
+  const hero = await getSectionContent(locale, SECTION_KEYS.contactHero)
   return (
     <>
       <PageHero
-        eyebrow="Contact"
-        title="Start a project. Build something golden."
-        description="Tell us where your business is today and what you want to build. We'll come back with a clear, practical next step — no jargon, no pressure."
+        eyebrow={hero.eyebrow ?? ''}
+        title={hero.title ?? ''}
+        description={hero.body ?? ''}
       />
 
       <section className="bg-background">

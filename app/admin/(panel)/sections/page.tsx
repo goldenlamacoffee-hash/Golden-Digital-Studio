@@ -2,6 +2,7 @@ import { AdminPageHeader } from '@/components/admin/admin-page-header'
 import { ResourceForm } from '@/components/admin/resource-form'
 import { DeleteButton } from '@/components/admin/delete-button'
 import { TextField, AreaField, ToggleField } from '@/components/admin/form-fields'
+import { MarkdownEditor } from '@/components/admin/markdown-editor'
 import { listSections } from '@/lib/admin/queries'
 import { saveSection, deleteSection } from '@/app/actions/admin'
 import { localeFromParam, type Locale } from '@/lib/i18n/config'
@@ -21,8 +22,14 @@ function Fields({ row }: { row?: Row }) {
       <div className="sm:col-span-2">
         <AreaField name="subtitle" label="Subtitle" defaultValue={row?.subtitle} rows={2} />
       </div>
-      <div className="sm:col-span-2">
-        <AreaField name="body" label="Body" defaultValue={row?.body} rows={4} />
+      <div className="sm:col-span-2 border-t border-border pt-4">
+        <MarkdownEditor
+          name="body"
+          label="Body"
+          defaultValue={row?.body}
+          rows={8}
+          hint="Supports headings, bold, lists and links. Rendered as formatted text on the site."
+        />
       </div>
       <TextField name="sortOrder" label="Sort order" defaultValue={String(row?.sortOrder ?? 0)} />
       <ToggleField name="isPublished" label="Published" defaultChecked={row?.isPublished ?? true} />

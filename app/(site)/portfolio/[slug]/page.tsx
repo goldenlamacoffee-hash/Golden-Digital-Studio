@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ArrowLeft, ArrowUpRight } from 'lucide-react'
 import { PortfolioImage } from '@/components/portfolio-image'
+import { MarkdownRenderer } from '@/components/markdown-renderer'
 import { CtaSection } from '@/components/sections/cta-section'
 import { FoxWatermark } from '@/components/fox-watermark'
 import { getLocale } from '@/lib/i18n/server'
@@ -22,10 +23,10 @@ export async function generateMetadata({
   if (!project) return { title: 'Project not found' }
   return {
     title: `${project.name} · Portfolio`,
-    description: project.description || `${project.name} — a Golden Digital Studio case study.`,
+    description: project.excerpt || `${project.name} — a Golden Digital Studio case study.`,
     openGraph: {
       title: `${project.name} · Golden Digital Studio`,
-      description: project.description || undefined,
+      description: project.excerpt || undefined,
       images: getProjectImage(project) ? [getProjectImage(project) as string] : undefined,
     },
   }
@@ -87,9 +88,9 @@ export default async function ProjectDetailPage({
             {project.name}
           </h1>
 
-          {project.description ? (
+          {project.excerpt ? (
             <p className="max-w-2xl text-pretty text-lg leading-relaxed text-muted-foreground">
-              {project.description}
+              {project.excerpt}
             </p>
           ) : null}
 
@@ -121,6 +122,13 @@ export default async function ProjectDetailPage({
               priority
             />
           </div>
+
+          {/* Full case-study body — markdown rendered as luxury prose */}
+          {project.body ? (
+            <div className="mx-auto mt-12 max-w-2xl sm:mt-16">
+              <MarkdownRenderer content={project.body} />
+            </div>
+          ) : null}
 
           {/* Editorial gallery grid */}
           {gridImages.length > 0 ? (

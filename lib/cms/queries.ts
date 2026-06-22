@@ -10,7 +10,7 @@ import {
 import type { Locale } from '@/lib/i18n/config'
 import { defaultLocale } from '@/lib/i18n/config'
 import * as seed from '@/lib/content'
-import { parseGallery, type GalleryImage } from '@/lib/portfolio'
+import { parseGallery, resolveProjectContent, type GalleryImage } from '@/lib/portfolio'
 
 /**
  * CMS read layer. Each getter returns published rows for the active locale.
@@ -113,22 +113,32 @@ export type ProjectItem = {
   slug: string
   name: string
   category: string
+  /** Raw legacy field, kept for backward compatibility. */
   description: string
+  /** Short preview text — used on cards and homepage previews only. */
+  excerpt: string
+  /** Full case-study body (markdown) — used only on the detail page. */
+  body: string
   imageUrl: string | null
   gallery: GalleryImage[]
   url: string | null
 }
 
 function seedProjects(): ProjectItem[] {
-  return seed.projects.map((p) => ({
-    slug: p.slug,
-    name: p.name,
-    category: p.category,
-    description: p.description,
-    imageUrl: null,
-    gallery: [],
-    url: null,
-  }))
+  return seed.projects.map((p) => {
+    const { excerpt, body } = resolveProjectContent({ description: p.description })
+    return {
+      slug: p.slug,
+      name: p.name,
+      category: p.category,
+      description: p.description,
+      excerpt,
+      body,
+      imageUrl: null,
+      gallery: [],
+      url: null,
+    }
+  })
 }
 
 export async function getProjects(locale: Locale): Promise<ProjectItem[]> {
@@ -144,15 +154,20 @@ export async function getProjects(locale: Locale): Promise<ProjectItem[]> {
       )
       .orderBy(asc(projectsTable.sortOrder))
     if (rows.length === 0) return seedProjects()
-    return rows.map((r) => ({
-      slug: r.slug,
-      name: r.name,
-      category: r.category ?? '',
-      description: r.description ?? '',
-      imageUrl: r.imageUrl,
-      gallery: parseGallery(r.gallery),
-      url: r.url,
-    }))
+    return rows.map((r) => {
+      const { excerpt, body } = resolveProjectContent(r)
+      return {
+        slug: r.slug,
+        name: r.name,
+        category: r.category ?? '',
+        description: r.description ?? '',
+        excerpt,
+        body,
+        imageUrl: r.imageUrl,
+        gallery: parseGallery(r.gallery),
+        url: r.url,
+      }
+    })
   } catch {
     return seedProjects()
   }
@@ -180,11 +195,14 @@ export async function getProject(
       .limit(1)
     const r = rows[0]
     if (!r) return null
+    const { excerpt, body } = resolveProjectContent(r)
     return {
       slug: r.slug,
       name: r.name,
       category: r.category ?? '',
       description: r.description ?? '',
+      excerpt,
+      body,
       imageUrl: r.imageUrl,
       gallery: parseGallery(r.gallery),
       url: r.url,

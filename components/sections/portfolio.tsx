@@ -5,7 +5,12 @@ import { FoxWatermark } from '@/components/fox-watermark'
 import { PortfolioImage } from '@/components/portfolio-image'
 import { projects as seedProjects } from '@/lib/content'
 import type { ProjectItem } from '@/lib/cms/queries'
-import { resolveCardImage, isValidExternalUrl } from '@/lib/portfolio'
+import {
+  resolveCardImage,
+  isValidExternalUrl,
+  getPortfolioExcerpt,
+  resolveProjectContent,
+} from '@/lib/portfolio'
 import { cn } from '@/lib/utils'
 
 type PortfolioSectionProps = {
@@ -21,15 +26,20 @@ export function PortfolioSection({
 }: PortfolioSectionProps) {
   const projects: ProjectItem[] =
     items ??
-    seedProjects.map((p) => ({
-      slug: p.slug,
-      name: p.name,
-      category: p.category,
-      description: p.description,
-      imageUrl: null,
-      gallery: [],
-      url: null,
-    }))
+    seedProjects.map((p) => {
+      const { excerpt, body } = resolveProjectContent({ description: p.description })
+      return {
+        slug: p.slug,
+        name: p.name,
+        category: p.category,
+        description: p.description,
+        excerpt,
+        body,
+        imageUrl: null,
+        gallery: [],
+        url: null,
+      }
+    })
 
   return (
     <section
@@ -124,8 +134,8 @@ export function PortfolioSection({
                   >
                     {project.name}
                   </h3>
-                  <p className="text-pretty leading-relaxed text-muted-foreground">
-                    {project.description}
+                  <p className="line-clamp-3 text-pretty leading-relaxed text-muted-foreground">
+                    {getPortfolioExcerpt(project)}
                   </p>
                   <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 pt-4">
                     <span className="inline-flex items-center gap-1.5 font-mono text-xs uppercase tracking-[0.2em] text-gold transition-colors group-hover:text-warm-gold">

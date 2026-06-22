@@ -124,6 +124,10 @@ export const projects = pgTable(
     name: text('name').notNull(),
     category: text('category'),
     description: text('description'),
+    /** Short preview text shown on cards/homepage. */
+    excerpt: text('excerpt'),
+    /** Full case-study body (markdown), shown only on /portfolio/[slug]. */
+    body: text('body'),
     imageUrl: text('image_url'),
     /** Ordered gallery images (see GalleryImage in lib/portfolio.ts). */
     gallery: jsonb('gallery').notNull().default([]),

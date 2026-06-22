@@ -40,6 +40,91 @@ export function isValidImageUrl(value: string | null | undefined): boolean {
   return hasImageUrl(value)
 }
 
+/* --------------------------- text / markdown --------------------------- */
+
+/**
+ * Strip common markdown syntax to produce clean plain text for previews,
+ * meta descriptions and excerpts. Never throws; returns '' for empty input.
+ */
+export function stripMarkdown(text: string | null | undefined): string {
+  if (!text) return ''
+  return text
+    .replace(/```[\s\S]*?```/g, ' ') // fenced code blocks
+    .replace(/`([^`]+)`/g, '$1') // inline code
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ') // images
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1') // links -> text
+    .replace(/^\s{0,3}#{1,6}\s+/gm, '') // headings
+    .replace(/^\s{0,3}>\s?/gm, '') // blockquotes
+    .replace(/^\s*[-*+]\s+/gm, '') // bullet markers
+    .replace(/^\s*\d+\.\s+/gm, '') // numbered markers
+    .replace(/(\*\*|__)(.*?)\1/g, '$2') // bold
+    .replace(/(\*|_)(.*?)\1/g, '$2') // italic
+    .replace(/~~(.*?)~~/g, '$1') // strikethrough
+    .replace(/^\s*([-*_]\s*){3,}\s*$/gm, ' ') // horizontal rules
+    .replace(/\r/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/**
+ * Derive a short, clean excerpt from any text (markdown or plain). Prefers the
+ * first paragraph; truncates on a word boundary around `max` characters.
+ */
+export function deriveExcerpt(
+  text: string | null | undefined,
+  max = 200,
+): string {
+  const firstParagraph = (text ?? '').split(/\n\s*\n/)[0] ?? ''
+  const plain = stripMarkdown(firstParagraph) || stripMarkdown(text)
+  if (plain.length <= max) return plain
+  const slice = plain.slice(0, max)
+  const lastSpace = slice.lastIndexOf(' ')
+  return `${(lastSpace > 60 ? slice.slice(0, lastSpace) : slice).trim()}…`
+}
+
+/**
+ * Heuristic: does this text look like a full case-study body rather than a
+ * one-line summary? True if it has markdown headings, bullet/numbered lists,
+ * multiple paragraphs, or is simply long. Used for backward-compatible
+ * migration of legacy `description` content into `body`.
+ */
+export function looksLikeRichBody(text: string | null | undefined): boolean {
+  if (!text) return false
+  const t = text.trim()
+  if (t.length > 280) return true
+  if (/^\s{0,3}#{1,6}\s+/m.test(t)) return true // headings
+  if (/^\s*[-*+]\s+/m.test(t)) return true // bullet list
+  if (/^\s*\d+\.\s+/m.test(t)) return true // numbered list
+  if (t.split(/\n\s*\n/).length > 1) return true // multiple paragraphs
+  return false
+}
+
+/**
+ * Resolve the clean { excerpt, body } pair for a project from its raw DB
+ * fields, with backward compatibility for legacy `description`-only rows.
+ * - body: explicit `body`, else the legacy `description` if it looks rich.
+ * - excerpt: explicit `excerpt`, else derived from body/description.
+ */
+export function resolveProjectContent(raw: {
+  excerpt?: string | null
+  body?: string | null
+  description?: string | null
+}): { excerpt: string; body: string } {
+  const rawExcerpt = (raw.excerpt ?? '').trim()
+  const rawBody = (raw.body ?? '').trim()
+  const rawDescription = (raw.description ?? '').trim()
+
+  const body = rawBody || (looksLikeRichBody(rawDescription) ? rawDescription : '')
+  const excerpt =
+    rawExcerpt ||
+    // If description is a short plain summary, use it directly as the excerpt.
+    (!rawBody && rawDescription && !looksLikeRichBody(rawDescription)
+      ? rawDescription
+      : deriveExcerpt(body || rawDescription))
+
+  return { excerpt, body }
+}
+
 /* ------------------------------- gallery ------------------------------- */
 
 export type GalleryDisplayMode = 'cover' | 'contain'
@@ -184,6 +269,19 @@ export function parseGallery(value: unknown): GalleryImage[] {
 export function getProjectImage(project: Pick<ProjectItem, 'imageUrl'>): string | null {
   const value = project.imageUrl?.trim()
   return value && hasImageUrl(value) ? value : null
+}
+
+/**
+ * Card-safe excerpt for a project. Uses the resolved `excerpt` when present,
+ * otherwise derives a clean one from body/description. Always plain text.
+ */
+export function getPortfolioExcerpt(
+  project: Pick<ProjectItem, 'excerpt' | 'body' | 'description'>,
+  max = 200,
+): string {
+  const explicit = (project.excerpt ?? '').trim()
+  if (explicit) return stripMarkdown(explicit)
+  return deriveExcerpt(project.body || project.description, max)
 }
 
 /**

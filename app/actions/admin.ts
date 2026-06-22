@@ -91,6 +91,8 @@ export async function saveProject(formData: FormData) {
     name: str(formData.get('name')),
     category: optStr(formData.get('category')),
     description: optStr(formData.get('description')),
+    excerpt: optStr(formData.get('excerpt')),
+    body: optStr(formData.get('body')),
     imageUrl: optStr(formData.get('imageUrl')),
     // Re-parse on the server so only valid, normalized gallery entries persist.
     gallery: parseGallery(str(formData.get('gallery'))),

@@ -74,6 +74,24 @@ export const SECTION_CATALOG: { key: string; label: string }[] = [
   { key: SECTION_KEYS.portfolioLabels, label: 'Portfolio — Shared labels' },
 ]
 
+/** Per-key descriptions of the expected `data` JSON shape, shown in the editor. */
+export const SECTION_DATA_HINTS: Record<string, string> = {
+  [SECTION_KEYS.homeHero]:
+    'Optional. { "primaryCta": "...", "secondaryCta": "...", "stats": [{ "value": "...", "label": "..." }] }',
+  [SECTION_KEYS.homeWhyUs]:
+    'List of value cards: { "items": [{ "title": "...", "description": "..." }] }',
+  [SECTION_KEYS.homeProcess]:
+    'List of steps: { "items": [{ "step": "01", "title": "...", "description": "..." }] }',
+  [SECTION_KEYS.homeAiTraining]:
+    'Highlights + CTA: { "items": [{ "title": "...", "description": "..." }], "primaryCta": "...", "secondaryCta": "..." }',
+  [SECTION_KEYS.homeFinalCta]:
+    'CTA buttons: { "primaryCta": "...", "secondaryCta": "..." }',
+  [SECTION_KEYS.footer]:
+    'Footer columns + blurb: { "blurb": "...", "columns": [{ "title": "...", "links": [{ "label": "...", "href": "..." }] }] }',
+  [SECTION_KEYS.portfolioLabels]:
+    'Reusable button/labels: { "signatureWork": "...", "viewCaseStudy": "...", "visitSite": "...", "allWork": "...", "visitLiveSite": "..." }',
+}
+
 /* --------------------------- English defaults --------------------------- */
 
 export const SECTION_DEFAULTS: Record<string, SectionDefault> = {

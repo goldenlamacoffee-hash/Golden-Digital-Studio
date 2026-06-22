@@ -167,7 +167,7 @@ export default async function ProjectDetailPage({
         </div>
       </section>
 
-      <CtaSection />
+      <CtaSection locale={locale} />
     </>
   )
 }

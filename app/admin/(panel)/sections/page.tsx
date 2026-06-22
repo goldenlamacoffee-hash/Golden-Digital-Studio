@@ -3,10 +3,12 @@ import { ResourceForm } from '@/components/admin/resource-form'
 import { DeleteButton } from '@/components/admin/delete-button'
 import { TextField, AreaField, ToggleField } from '@/components/admin/form-fields'
 import { MarkdownEditor } from '@/components/admin/markdown-editor'
+import { SectionDataField } from '@/components/admin/section-data-field'
 import { LocaleEmptyState } from '@/components/admin/locale-empty-state'
 import { listSections, getEntityCountsByLocale } from '@/lib/admin/queries'
 import { saveSection, deleteSection } from '@/app/actions/admin'
 import { getAdminLocale } from '@/lib/admin/locale'
+import { SECTION_DATA_HINTS } from '@/lib/cms/section-content'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,6 +32,12 @@ function Fields({ row }: { row?: Row }) {
           defaultValue={row?.body}
           rows={8}
           hint="Supports headings, bold, lists and links. Rendered as formatted text on the site."
+        />
+      </div>
+      <div className="sm:col-span-2 border-t border-border pt-4">
+        <SectionDataField
+          defaultValue={row?.data}
+          hint={row?.key ? SECTION_DATA_HINTS[row.key] : undefined}
         />
       </div>
       <TextField name="sortOrder" label="Sort order" defaultValue={String(row?.sortOrder ?? 0)} />

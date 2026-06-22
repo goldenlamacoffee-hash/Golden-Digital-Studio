@@ -6,10 +6,11 @@ import { ExcerptField } from '@/components/admin/excerpt-field'
 import { MarkdownEditor } from '@/components/admin/markdown-editor'
 import { ImageUrlField } from '@/components/admin/image-url-field'
 import { GalleryEditor } from '@/components/admin/gallery-editor'
-import { listProjects } from '@/lib/admin/queries'
+import { LocaleEmptyState } from '@/components/admin/locale-empty-state'
+import { listProjects, getEntityCountsByLocale } from '@/lib/admin/queries'
 import { saveProject, deleteProject } from '@/app/actions/admin'
 import { resolveProjectContent } from '@/lib/portfolio'
-import { localeFromParam, type Locale } from '@/lib/i18n/config'
+import { getAdminLocale } from '@/lib/admin/locale'
 
 export const dynamic = 'force-dynamic'
 
@@ -66,8 +67,11 @@ export default async function AdminProjectsPage({
   searchParams: Promise<{ locale?: string }>
 }) {
   const { locale: localeParam } = await searchParams
-  const locale: Locale = localeFromParam(localeParam)
-  const rows = await listProjects(locale)
+  const { locale } = await getAdminLocale(localeParam)
+  const [rows, localeCounts] = await Promise.all([
+    listProjects(locale),
+    getEntityCountsByLocale('projects'),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -83,9 +87,7 @@ export default async function AdminProjectsPage({
       />
 
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-          No projects for this locale yet.
-        </p>
+        <LocaleEmptyState entity="projects" label="projects" current={locale} counts={localeCounts} />
       ) : (
         <div className="flex flex-col gap-3">
           {rows.map((row) => (

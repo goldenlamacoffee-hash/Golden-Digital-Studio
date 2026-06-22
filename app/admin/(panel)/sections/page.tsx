@@ -3,9 +3,10 @@ import { ResourceForm } from '@/components/admin/resource-form'
 import { DeleteButton } from '@/components/admin/delete-button'
 import { TextField, AreaField, ToggleField } from '@/components/admin/form-fields'
 import { MarkdownEditor } from '@/components/admin/markdown-editor'
-import { listSections } from '@/lib/admin/queries'
+import { LocaleEmptyState } from '@/components/admin/locale-empty-state'
+import { listSections, getEntityCountsByLocale } from '@/lib/admin/queries'
 import { saveSection, deleteSection } from '@/app/actions/admin'
-import { localeFromParam, type Locale } from '@/lib/i18n/config'
+import { getAdminLocale } from '@/lib/admin/locale'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,8 +44,11 @@ export default async function AdminSectionsPage({
   searchParams: Promise<{ locale?: string }>
 }) {
   const { locale: localeParam } = await searchParams
-  const locale: Locale = localeFromParam(localeParam)
-  const rows = await listSections(locale)
+  const { locale } = await getAdminLocale(localeParam)
+  const [rows, localeCounts] = await Promise.all([
+    listSections(locale),
+    getEntityCountsByLocale('sections'),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -60,9 +64,7 @@ export default async function AdminSectionsPage({
       />
 
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-          No custom sections for this locale yet. The site uses built-in defaults until you add overrides.
-        </p>
+        <LocaleEmptyState entity="sections" label="sections" current={locale} counts={localeCounts} />
       ) : (
         <div className="flex flex-col gap-3">
           {rows.map((row) => (

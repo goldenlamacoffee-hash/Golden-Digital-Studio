@@ -6,6 +6,7 @@ import {
   ImageIcon,
   Inbox,
   ArrowUpRight,
+  ExternalLink,
 } from 'lucide-react'
 import {
   getCounts,
@@ -13,7 +14,9 @@ import {
   getLocaleContentCounts,
 } from '@/lib/admin/queries'
 import { getHostDebug } from '@/lib/i18n/server'
-import { locales, localeMeta } from '@/lib/i18n/config'
+import { getAdminLocale } from '@/lib/admin/locale'
+import { AdminLocaleTabs } from '@/components/admin/admin-locale-tabs'
+import { locales, localeMeta, localeOrigin } from '@/lib/i18n/config'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,25 +28,85 @@ const cards = [
   { key: 'inquiries', label: 'Inquiries', href: '/admin/inquiries', icon: Inbox },
 ] as const
 
-export default async function AdminDashboard() {
-  const [counts, newInquiries, hostDebug, localeCounts] = await Promise.all([
-    getCounts(),
-    countNewInquiries(),
-    getHostDebug(),
-    Promise.all(
-      locales.map(async (l) => ({ locale: l, counts: await getLocaleContentCounts(l) })),
-    ),
-  ])
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams: Promise<{ locale?: string }>
+}) {
+  const { locale: localeParam } = await searchParams
+  const [adminLocale, counts, newInquiries, hostDebug, localeCounts] =
+    await Promise.all([
+      getAdminLocale(localeParam),
+      getCounts(),
+      countNewInquiries(),
+      getHostDebug(),
+      Promise.all(
+        locales.map(async (l) => ({ locale: l, counts: await getLocaleContentCounts(l) })),
+      ),
+    ])
+
+  const { locale: editing, source, hostLocale } = adminLocale
+  const editingMeta = localeMeta[editing]
+  const q = `?locale=${editing}`
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
-        <h1 className="font-heading text-3xl font-semibold text-foreground">
-          Dashboard
-        </h1>
-        <p className="mt-1 text-muted-foreground">
-          Manage content across all markets from one place.
-        </p>
+      <div className="flex flex-col gap-4 border-b border-border pb-6">
+        <div>
+          <h1 className="font-heading text-3xl font-semibold text-foreground">
+            Dashboard
+          </h1>
+          <p className="mt-1 text-muted-foreground">
+            Central multi-market CMS — edit Czech, Slovak and English content
+            from one place.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <AdminLocaleTabs current={editing} />
+            <span className="text-sm text-muted-foreground">
+              Editing:{' '}
+              <span className="font-medium text-gold">
+                {editingMeta.label} / {editingMeta.market}
+              </span>
+            </span>
+          </div>
+          <a
+            href={localeOrigin(editing)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:border-gold/50 hover:text-foreground"
+          >
+            <ExternalLink className="size-3.5" />
+            Preview {editingMeta.market} site
+          </a>
+        </div>
+
+        <dl className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Current domain
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground break-all">
+              {hostDebug.host ?? 'localhost / preview'}
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Public domain language
+            </dt>
+            <dd className="mt-1 text-sm text-foreground">
+              {localeMeta[hostLocale].label} ({localeMeta[hostLocale].market})
+            </dd>
+          </div>
+          <div className="rounded-lg border border-border/60 p-3">
+            <dt className="text-xs uppercase tracking-wide text-muted-foreground">
+              Admin locale source
+            </dt>
+            <dd className="mt-1 font-mono text-sm text-foreground">{source}</dd>
+          </div>
+        </dl>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -53,7 +116,7 @@ export default async function AdminDashboard() {
           return (
             <Link
               key={card.key}
-              href={card.href}
+              href={`${card.href}${q}`}
               className="group flex flex-col gap-4 rounded-xl border border-border bg-card p-6 transition-colors hover:border-gold/50"
             >
               <div className="flex items-center justify-between">
@@ -167,8 +230,22 @@ export default async function AdminDashboard() {
             </thead>
             <tbody>
               {localeCounts.map(({ locale, counts: c }) => (
-                <tr key={locale} className="border-b border-border/50">
-                  <td className="py-2 pr-4 font-mono text-foreground">{locale}</td>
+                <tr
+                  key={locale}
+                  className={
+                    locale === editing
+                      ? 'border-b border-border/50 bg-gold/5'
+                      : 'border-b border-border/50'
+                  }
+                >
+                  <td className="py-2 pr-4 font-mono text-foreground">
+                    {locale}
+                    {locale === editing ? (
+                      <span className="ml-2 rounded bg-gold/15 px-1.5 py-0.5 text-[10px] font-medium uppercase text-gold">
+                        editing
+                      </span>
+                    ) : null}
+                  </td>
                   <td className="py-2 pr-4 font-mono text-muted-foreground">
                     {localeMeta[locale].domain}
                   </td>

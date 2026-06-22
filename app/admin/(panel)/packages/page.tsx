@@ -2,9 +2,10 @@ import { AdminPageHeader } from '@/components/admin/admin-page-header'
 import { ResourceForm } from '@/components/admin/resource-form'
 import { DeleteButton } from '@/components/admin/delete-button'
 import { TextField, AreaField, ToggleField } from '@/components/admin/form-fields'
-import { listPackages } from '@/lib/admin/queries'
+import { LocaleEmptyState } from '@/components/admin/locale-empty-state'
+import { listPackages, getEntityCountsByLocale } from '@/lib/admin/queries'
 import { savePackage, deletePackage } from '@/app/actions/admin'
-import { localeFromParam, type Locale } from '@/lib/i18n/config'
+import { getAdminLocale } from '@/lib/admin/locale'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,8 +45,11 @@ export default async function AdminPackagesPage({
   searchParams: Promise<{ locale?: string }>
 }) {
   const { locale: localeParam } = await searchParams
-  const locale: Locale = localeFromParam(localeParam)
-  const rows = await listPackages(locale)
+  const { locale } = await getAdminLocale(localeParam)
+  const [rows, localeCounts] = await Promise.all([
+    listPackages(locale),
+    getEntityCountsByLocale('packages'),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -61,9 +65,7 @@ export default async function AdminPackagesPage({
       />
 
       {rows.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-          No packages for this locale yet.
-        </p>
+        <LocaleEmptyState entity="packages" label="packages" current={locale} counts={localeCounts} />
       ) : (
         <div className="flex flex-col gap-3">
           {rows.map((row) => (

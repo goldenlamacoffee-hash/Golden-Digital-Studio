@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { locales, localeMeta, type Locale } from '@/lib/i18n/config'
-import { ADMIN_LOCALE_COOKIE } from '@/lib/admin/locale'
+import { ADMIN_LOCALE_COOKIE } from '@/lib/admin/locale-shared'
 import { cn } from '@/lib/utils'
 
 /**

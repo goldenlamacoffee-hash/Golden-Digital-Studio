@@ -17,7 +17,7 @@ import {
 import { authClient } from '@/lib/auth-client'
 import { BrandLogo } from '@/components/brand-logo'
 import { localeMeta, isLocale, type Locale } from '@/lib/i18n/config'
-import { ADMIN_LOCALE_COOKIE } from '@/lib/admin/locale'
+import { ADMIN_LOCALE_COOKIE } from '@/lib/admin/locale-shared'
 import { cn } from '@/lib/utils'
 
 const navItems = [

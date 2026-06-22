@@ -15,7 +15,7 @@ import {
 } from '@/lib/db/schema'
 import { requireAdmin } from '@/lib/admin/guard'
 import { isLocale, defaultLocale, type Locale } from '@/lib/i18n/config'
-import { assertValidLocale } from '@/lib/admin/locale'
+import { assertValidLocale } from '@/lib/admin/locale-shared'
 import { parseGallery } from '@/lib/portfolio'
 
 /* ------------------------------- helpers ------------------------------- */

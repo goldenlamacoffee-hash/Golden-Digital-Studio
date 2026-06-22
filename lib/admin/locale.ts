@@ -1,42 +1,19 @@
 import { cookies, headers } from 'next/headers'
+import { defaultLocale, resolveLocale, type Locale } from '@/lib/i18n/config'
 import {
-  isLocale,
-  defaultLocale,
-  resolveLocale,
-  type Locale,
-} from '@/lib/i18n/config'
+  ADMIN_LOCALE_COOKIE,
+  normalizeLocale,
+  type AdminLocaleSource,
+} from '@/lib/admin/locale-shared'
 
-/**
- * Admin-only cookie that remembers which market/locale the operator is
- * currently editing. This is completely independent from the PUBLIC locale
- * (which is decided by the request domain). It lets an admin open `/admin` on
- * any owned domain — or localhost — and still edit CZ / SK / EN content.
- */
-export const ADMIN_LOCALE_COOKIE = 'gds_admin_locale'
-
-export type AdminLocaleSource = 'param' | 'cookie' | 'host' | 'default'
-
-/** Strict normalization: only exact, known locale codes are accepted. */
-export function normalizeLocale(value: string | null | undefined): Locale | null {
-  if (!value) return null
-  const trimmed = value.trim()
-  if (isLocale(trimmed)) return trimmed
-  // Tolerate short forms coming from older links / manual input.
-  const short = trimmed.toLowerCase()
-  if (short === 'cs' || short === 'cz') return 'cs-CZ'
-  if (short === 'sk') return 'sk-SK'
-  if (short === 'en') return 'en'
-  return null
-}
-
-/** Throwing variant — use in server actions where an invalid locale is a bug. */
-export function assertValidLocale(value: string | null | undefined): Locale {
-  const normalized = normalizeLocale(value)
-  if (!normalized) {
-    throw new Error(`Invalid locale: ${String(value)}`)
-  }
-  return normalized
-}
+// Re-export the client-safe pieces so server callers can keep importing from
+// a single place.
+export {
+  ADMIN_LOCALE_COOKIE,
+  normalizeLocale,
+  assertValidLocale,
+  type AdminLocaleSource,
+} from '@/lib/admin/locale-shared'
 
 /**
  * Resolve which locale the admin is editing. Priority:
